@@ -1,0 +1,17 @@
+Ecshop没有点击邮件中的确认收货链接，但是进入个人中心却发现订单状态已经更改为了已经收到货的状态了。问题出在QQ邮箱。Ecshop的recieve设计是用户点了链接直接就改变订单状态到确认收货，而QQ邮件spam系统会自动去点邮件里的链接是不是垃圾或者广告地址，所以，全被点成确认收货了，只能改recieve了。
+
+将之前的ecshop确认收货页面改成如下格式：
+
+//确认页面
+$act = !empty($_REQUEST['act']) ? rawurldecode(trim($_REQUEST['ver'])) : 'confirm'; // 验证码
+if($act == 'confirm')
+{
+$msg = $order['order_sn']."确认收货？<button onclick=\"location.href='receive.php?act=receive&id=".$order_id."&con=".rawurlencode($consignee)."&ver=".$ver."';\">确定</a>";
+}
+//收货
+else
+{
+/* 修改订单发货状态为“确认收货” */
+        ......
+}
+加一个确认的页面，这样SPAM点到链接后就不会触发订单状态更改的事件

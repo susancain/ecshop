@@ -1,0 +1,42 @@
+ecshop兼容PHP版本较低,不兼容PHP更高的版本,如果使用其他版本可能会出现各种错误,如以下七种错误问题:
+1、Strict Standards: Non-static method cls_image::gd_version() should not be called statically
+   未声明静态static
+   将return cls_image::gd_version();
+    替换为
+    $p = new cls_image();
+    return $p->gd_version();
+2、Strict Standards: Only variables should be passed by reference
+    变量应该通过引用传递
+    将$tag_sel = array_shift(explode(' ', $tag));
+   替换为
+   $tag_arr = explode(' ', $tag);
+  $tag_sel = array_shift($tag_arr);
+3、Deprecated: preg_replace(): The /e modifier is deprecated, use preg_replace_callback instead in
+    将 return preg_replace("/{([^\}\{\n]*)}/e", "\$this->sel ect('\\1');", $source);
+   替换为
+   return preg_replace_callback  ("/{([^\}\{\n]*)}/", function($r) { return $this->sel ect($r[1]); },    $source);
+4、Strict Standards: Redefining already defined constructor for class paypal
+
+   PHP 类，有两种构造函数，一种是跟类同名的函数，一种是 ____construct()。从PHP5.4开始，对这两个函数出现的顺序做了最严格的定义，必须是 ____construct() 在前，同名函数在后
+例如：
+function __construct()
+    {
+        $this->paypal();
+    }
+   
+    function paypal()
+    {
+    }
+5、mktime(): You should be using the time() function instead
+mktime()方法不带参数被调用
+将$auth = mktime();
+替换为
+$auth = time();
+6、Strict Standards: Declaration of vbb::set_cookie() should be compatible with integrate::set_cookie($username = '', $remember = NULL)
+子类的函数跟父类的同名，必须使子类的函数参数跟父类的对应函数参数个数相同
+依据错误提示，修改例如：
+function set_cookie ($username="")
+改为
+function set_cookie ($username="", $remember = NULL)
+7、Parse error: syntax error, unexpected ';'
+语法错误，缺少;或者echo没有输出值

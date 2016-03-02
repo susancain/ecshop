@@ -1,0 +1,31 @@
+Ecshop后台的订单数据统计不正确，问题出在order_status.php文件function get_orderinfo($start_date, $end_date)的定义，其中所有的sql都用了下面的代码：
+
+ function get_orderinfo($start_date, $end_date)
+ {
+    $order_info = array();
+
+    /* 未确认订单数 */
+    $sql = 'SELECT COUNT(*) AS unconfirmed_num FROM ' .$GLOBALS['ecs']->table('order_info').
+           " WHERE order_status = '" .OS_UNCONFIRMED. "' AND add_time >= '$start_date'".
+           " AND add_time < '" . ($end_date + 86400) . "'"; 
+
+很显然，这里有个很明显的逻辑错误，即$end_date+86400，除非这里用户选择的开始时间和结束时间是同一天，否则没有必要加上86400(86400秒等于1天)，这个错误结果会导致最后的订单统计数量已经不是在指定时间段内的数据，而是指定的时间后再加上一天。
+
+另外Ecshop自己本身订单确认功能，导致的默认订单统计页面，只显示未确认，已确认，已成交，无效这四个信息。这四个信息都不包括最最重要的已付款的订单数的信息
+
+只要将无用的已确认订单统计代码改成已支付的统计代码：
+
+/* 已确认订单数 */
+    $sql = 'SELECT COUNT(*) AS confirmed_num FROM ' .$GLOBALS['ecs']->table('order_info').
+           " WHERE order_status = '" .OS_CONFIRMED. "' AND shipping_status NOT ". db_create_in(array(SS_SHIPPED, SS_RECEIVED)) . " AND pay_status NOT" . db_create_in(array(PS_PAYED, PS_PAYING)) ." AND add_time >= '$start_date'".
+           " AND add_time < '" . ($end_date + 86400) . "'";
+    $order_info['confirmed_num'] = $GLOBALS['db']->getOne($sql);
+改成：
+
+/* by tiandi 已支付订单数 */
+    $sql = 'SELECT COUNT(*) AS confirmed_num FROM ' .$GLOBALS['ecs']->table('order_info').
+           " WHERE pay_status =" . PS_PAYED ." AND shipping_status NOT" . db_create_in(array(SS_SHIPPED, SS_RECEIVED)) ." AND add_time >= '$start_date'".
+           " AND add_time < $end_date";
+    $order_info['confirmed_num'] = $GLOBALS['db']->getOne($sql);
+
+即可修复ecshop统计不准备问题。
