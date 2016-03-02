@@ -1,0 +1,15 @@
+ecshop商品详情页显示商品销量,修改一下代码放到网站根目录下goods.php文件中最底部，与其他方法并列
+function showxl($goods_id)
+{
+$sql = "sel ect sum(goods_number) from ".$GLOBALS['ecs']->table('order_goods')."where goods_id = $goods_id";
+$rew = $GLOBALS['db']->getOne($sql);
+return $rew;
+
+}
+查询统计数据库中订单商品表里订单商品销售数量
+搜索  “当前位置”  放在其下
+ $smarty->assign('xl',          showxl($goods_id));
+
+
+goods.dwt文件中在相应的位置中加入
+销量：{if $xl}{$xl}{else}0{/if}
