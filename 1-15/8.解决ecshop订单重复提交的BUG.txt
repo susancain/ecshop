@@ -1,0 +1,11 @@
+ecshop在某种情况下，订单总会重复提交，管理不方便
+1 找到ecshop模板目录下flow.dwt文件，
+找到<input type="image" src="images/bnt_subOrder.gif" id="tijiaoorder"/>提交按钮，给input 添加
+ 
+id=“tijiaoorder”
+ 
+2.打开根目录下js/shopping_flow.js文件，
+找到checkOrderForm函数，
+在frm.action = frm.action + '?step=done';行上方添加 
+document.getElementById("tijiaoorder").disabled="disabled";
+这样就可以防止订单重复提交了。

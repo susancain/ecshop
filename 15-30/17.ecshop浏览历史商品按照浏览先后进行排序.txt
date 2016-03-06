@@ -1,0 +1,8 @@
+在Ecshop中，浏览历史目前默认的显示顺序是按照商品的ID排序的，怎么样能让它按照浏览的先后进行排序呢？？
+下面是修改方法，很简单的，只需要修改一行代码即可。
+打开 includes/lib_insert.php，找到 insert_history() 函数部分
+将
+" WHERE $where AND is_on_sale = 1 AND is_alone_sale = 1 AND is_delete = 0";
+
+修改为
+" WHERE $where AND is_on_sale = 1 AND is_alone_sale = 1 AND is_delete = 0 order by INSTR('".$_COOKIE['ECS']['history']."',goods_id)";

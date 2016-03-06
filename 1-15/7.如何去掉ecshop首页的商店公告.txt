@@ -1,0 +1,26 @@
+不同的ecshop模板，具体的修改细节是不一样的，
+
+1）、如果你使用的是官方默认模板，请看下面
+打开 /themes/default/index.dwt 文件
+将下面代码部分删除即可
+
+<!--站内公告 start-->
+    <div class="box">
+     <div class="box_1">
+      <h3><span>{$lang.shop_notice}</span></h3>
+      <div class="boxCenterList RelaArticle">
+        {$shop_notice}
+      </div>
+     </div>
+    </div>
+    <div class="blank5"></div>
+    <!--站内公告 end-->
+
+
+2）、
+如果你使用的是其他模板，打开 /themes/你的模板文件夹/index.dwt 
+搜索
+{$shop_notice}
+
+注意，搜索到该字符串以后，要观察它周围（前后都算）的一些DIV 标签，把对应的DIV部分都删掉就可以了。
+如果你能看懂HTML代码，那应该很容易的。

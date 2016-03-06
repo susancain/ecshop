@@ -1,0 +1,23 @@
+ 比如：配送区域这里，我只做一个省或者市的电子商务市场，那么怎么办呢？有没有让客户打开就是自己所在的省市呢？当然可以，最简单就是到后台把地区给删了，太多删的累，那么下面最模板就说说修改方法。
+ 
+实现省市默认需要修改两个文件：1.根目录下的flow.php 2.修改theme/模版名目录/library/consignee.lbi
+ 1.flow.php 第357行
+$city_list[$region_id]     = get_regions(2, $consignee['province']);
+$district_list[$region_id] = get_regions(3, $consignee['city']);
+将以上两行代码修改为
+$city_list[$region_id]     = get_regions(2, 19);          //19代表内蒙古
+$district_list[$region_id] = get_regions(3, 262);     //262代表赤峰
+ 
+很好，第一个文件修改完毕，至此，你已经完成一半了，下面继续修改第二个文件。
+ 
+2.theme/模版名目录/library/consignee.lbi
+<option value="{$province.region_id}" {if $consignee.province eq $province.region_id}selected{/if}>{$province.region_name}</option>
+ 
+修改为
+<option value="{$province.region_id}" {if $consignee.province eq $province.region_id  or $province.region_id eq 19}selected{/if}>{$province.region_name}</option>
+往下面四五行 
+<option value="{$city.region_id}" {if $consignee.city eq $city.region_id}selected{/if}>{$city.region_name}</option>
+修改为
+<option value="{$city.region_id}" {if $consignee.city eq $city.region_id or $city.region_id eq 262}selected{/if}>{$city.region_name}</option>
+ 
+好了，以上修改不会出现省那一栏空白，最模板已修正，请放心使用。

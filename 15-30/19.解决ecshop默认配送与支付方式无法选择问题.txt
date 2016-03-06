@@ -1,0 +1,29 @@
+只需要修改两个地方，就可以实现更改默认的配送方式不选择的问题
+includes\lib_order.php 的函数 
+
+function last_shipping_and_payment()
+{
+$sql = "SELECT shipping_id, pay_id " .
+" FROM " . $GLOBALS['ecs']->table('order_info') .
+" WHERE user_id = '$_SESSION[user_id]' " .
+" ORDER BY order_id DESC LIMIT 1";
+$row = $GLOBALS['db']->getRow($sql);
+
+if (empty($row))
+{
+/* 如果获得是一个空数组，则返回默认值 */
+$row = array('shipping_id' => 1, 'pay_id' => 0); // 修改这里的1，可以修改默认为你安装的第几个配送方式 0 是默认的支付方式
+}
+
+return $row;
+}
+
+打开根目录flow.php
+
+找到
+$smarty->assign('order', $order);
+这一行，具体 位置在flow.php的第496行。
+在这行前面加上
+$order['shipping_id'] = 配送ID;/* 配送方式赋值*/
+$order['pay_id'] = 支付ID; /* 支付方式赋值*/
+[object Object]

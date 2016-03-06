@@ -1,0 +1,28 @@
+在做ecshop模板活动列表页面时，添加活动列表的时候，需要添加广告，可是该怎么调用广告位呢？调用广告，而且方法简单，操作又便捷
+//第一步：定义index变量
+    <?php
+     $index=0;
+     ?>
+ //第二步：进入循环
+       <!-- {foreach from=$list item=val name=name} -->
+ //第三步：给循环里的index值赋值，依次加1
+     <?php
+     $index=$index+1;
+     $GLOBALS['smarty']->assign('index',$index);
+     ?>
+      <div class="list_biaoti" id="tg4"> <h3><i></i>活动 {$smarty.foreach.name.iteration}&nbsp;?&nbsp;&nbsp;{$val.act_name}
+</h3></div>
+      <div id="tj4" class="list_tuangou"><div class="list_tt">
+ // 第四步：调用广告位循环，特别注意ID那里，这里直接调用活动ID是出现错误的，所以这里只能调用刚刚赋值的变量index的值
+       <?php
+     
+    $GLOBALS['smarty']->assign('index_image',get_advlist('活动ID'.$index.'-左侧活动图片', 1));
+      ?>
+        {foreach from=$index_image item=ad name=index_image}
+          {if $smarty.foreach.index_image.iteration < 2}
+      <div class="left"><a href="{$ad.url}"><img src="{$ad.image}" height="263" width="770"></a></div>
+         {/if}
+       {/foreach}
+ {/foreach}
+ 
+此方法可以运用到多处模板循环套用的地方，活学活用，样式自己定义哦...

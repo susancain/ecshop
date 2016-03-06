@@ -1,0 +1,48 @@
+一、在数据库添加字段，会手写的就后台添加，不会就进入phpmyadmin默认的就行。这是通用的写法
+ALTER TABLE `kbt_goods` ADD `goods_gift` VARCHAR( 500 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL AFTER `is_check` ;
+
+表名做下修改即可。
+
+二、修改admin/good.php
+找到
+/* 处理商品数据 */
+$shop_price = !empty($_POST['shop_price']) ? $_POST['shop_price'] : 0;
+
+后面依葫芦画瓢添加近自己字段。
+找到
+/* 入库 */
+if ($is_insert)
+{
+if ($code == '')
+
+同样依葫芦画瓢添加近自己字段，
+找到
+"goods_gift = '$goods_gift'," .
+
+同样依葫芦画瓢添加近自己字段。
+
+三、修改admin/templates/goods_info.htm
+在合适的地方添加，如果想在编辑商品—其他信息处添加，找到
+{if $code eq ''}
+
+{$lang.lab_goods_gift}
+
+{$goods.goods_gift}
+
+{/if}
+
+添加
+
+{$lang.lab_goods_sz}
+
+{$goods.goods_sz}
+
+
+四、修改模板在合适的地方添加：如果想在商品重量下添加查找
+{$goods.goods_weight}
+
+在下面添加
+{$lang.goods_sz}{$goods.goods_sz}
+自己修改相应字段。
+
+五、基本到位，下面就是修改下语言项，不想修改也可以，将{$lang.goods_sz}、{$lang.lab_goods_sz}改成自己需要的个汉字即可。

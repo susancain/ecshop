@@ -1,0 +1,17 @@
+关于ecshop导航栏的显示的条数控制，可能会因为我们网站的一些特殊要求，如果导航栏条数过多，就会造成页面导航栏的一个错位，所以我们有必要来控制一下导航栏的条数。
+设置的方法，ecshop模板网总结的共有两种。
+第一种：在page_header.lbi的库文件中没有限制条数，直接调用
+ 
+<!-- {foreach name=nav_top_list from=$navigator_list.top item=nav} -->
+<!-- {/foreach} -->
+ 
+这样的话，我们可以在后台设置，设置哪些需要在导航栏显示或者是不显示。这是一种比较容易理解的方法。
+ 
+第二种：在page_header.lbi中对导航条有一个显示，调用了{if}语句
+<!-- {foreach name=nav_middle_list from=$navigator_list.middle item=nav } --> 
+<!--{if $smarty.foreach.nav_middle_list.iteration < 8}--> 
+<a href="{$nav.url}" style="font-size:15px;" {if $nav.active eq 1} class="current"{/if} {if $nav.opennew eq 1}target="_blank" {/if} title="{$nav.name}" >{$nav.name}</a> 
+<!--{/if}--> 
+<!-- {/foreach} -->  
+ 
+上边<!--{if $smarty.foreach.nav_middle_list.iteration < 8}--> 的数字8就是对导航条条数的一个控制，你可以根据需要修改数字，这样的话，不管你在后台有多少需要显示在导航条的链接，在前台指可以显示一定的数目。

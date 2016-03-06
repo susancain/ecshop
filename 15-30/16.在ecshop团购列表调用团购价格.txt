@@ -1,0 +1,20 @@
+1）、
+首先修改  /group_buy.php  文件
+找到
+$group_buy['price_ladder'] = $price_ladder;
+在它下边增加一段代码
+$group_buy_info = group_buy_info($group_buy['act_id']);
+$group_buy['formated_cur_price'] = $group_buy_info['formated_cur_price'];
+ 
+2）、
+然后修改对应的ECSHOP模板文件 ：   /themes/模板文件夹/group_buy_list.dwt
+在
+{$lang.gb_price_ladder}<br />
+上边增加一段代码
+<font color=#ff3300>当前价格：{$group_buy.formated_cur_price} </font><br />
+这样就OK了，
+这样修改以后就能得到如上的图示效果，
+上图中的红色部分就是团购的当前价格。
+如果修改后，
+没看到团购列表页有任何变化，
+去ECSHOP后台清下缓存即可。

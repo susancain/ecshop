@@ -1,0 +1,69 @@
+Ecshop提供了密码找回功能，但是整个密码找回流程中存在一些设计上的安全隐患, Ecshop程序使用了MD5不可逆加密算法，但是计算密文的生成元素都有可以很轻易地被黑客拿到 /* if (md5($adminid . $password) <> $code) 1. $adminid: 黑客显式指定 2. $password: 暴力枚举 */
+2. 对重复失败次数没有做限制
+1. 漏洞触发条件
+
+HTTP Package Repeater
+
+2 漏洞影响范围
+
+1. ecshop 2.7.2
+2. ecshop 2.7.3
+
+3. 漏洞代码分析
+
+admin/get_password.php
+
+/* 验证新密码，更新管理员密码 */
+    elseif (!empty($_POST['action']) && $_POST['action'] == 'reset_pwd')
+    {
+  $new_password = isset($_POST['password']) ? trim($_POST['password'])  : '';
+  $adminid      = isset($_POST['adminid'])  ? intval($_POST['adminid']) : 0;
+  $code	= isset($_POST['code'])     ? trim($_POST['code'])      : '';
+  if (empty($new_password) || empty($code) || $adminid == 0)
+  {
+      ecs_header("Location: privilege.php?act=login\n");
+      exit;
+  }
+  /* 以用户的原密码，与code的值匹配 */
+  $sql = 'SELECT password FROM ' .$ecs->table('admin_user'). " WHERE user_id = '$adminid'";
+  $password = $db->getOne($sql);
+  /*
+  这里是漏洞的关键
+  1. $adminid：黑客想要爆破攻击重置密码的对象
+  2. $password：黑客通过密码暴力枚举
+  3. $code：黑客可以在本地使用相同的算法进行计算得到
+  */
+  if (md5($adminid . $password) <> $code)
+  {
+      //此链接不合法
+      $link[0]['text'] = $_LANG['back'];
+      $link[0]['href'] = 'privilege.php?act=login';
+      sys_msg($_LANG['code_param_error'], 0, $link);
+  }
+
+
+4. 防御方法
+
+这个漏洞属于密码学的抗穷举设计缺陷，要对这个漏洞进行修复，同时要能保证对原有的业务进行平滑兼容，我们可以从以下几个方面去思考
+
+1. 增加密钥空间，提供攻击者的攻击成本：容易实现 2. 改变加密算法，间接地提高了密钥空间：需要对原有旧的密码进行全量地升级，改造成本大
+admin/get_password.php
+
+/* 以用户的原密码，与code的值匹配 */
+$sql = 'SELECT password FROM ' .$ecs->table('admin_user'). " WHERE user_id = '$adminid'";
+$password = $db->getOne($sql); 
+if (md5($adminid . $password) <> $code)
+{
+  //此链接不合法
+  $link[0]['text'] = $_LANG['back'];
+  $link[0]['href'] = 'privilege.php?act=login';
+  sys_msg($_LANG['code_param_error'], 0, $link);
+}
+//更新管理员的密码
+/*
+这里是pathc code的关键
+代码中增加了随机数的盐，这极大地增加了黑客爆破的密钥空间，提供了攻击成本
+*/
+  $ec_salt=rand(1,9999);
+$sql = "UPDATE " .$ecs->table('admin_user'). "SET password = '".md5(md5($new_password).$ec_salt)."',`ec_salt`='$ec_salt' ".
+     "WHERE user_id = '$adminid'";

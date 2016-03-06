@@ -1,0 +1,645 @@
+Ecshop是电子商务解决方案，很成熟很完善。但是要学会进行二次开发。什么帮助文档都不需要，直接代码入手。代码就是最好的帮助文档。
+
+直接代码：
+
+index.php剖析
+
+define('IN_ECS', true); 
+require(dirname(__FILE__) . '/includes/init.php');
+首先是定义一个常量，标识已经进入ECS。然后引入includes目录下的init.php文件。
+
+includes里面是一些核心文件，核心类。
+
+好，我们直接进入init.php文件下探索个究竟。
+
+require(ROOT_PATH . 'data/config.php');
+init.php中引入了一些配置
+
+复制代码
+<?php 
+// database host $db_host = "localhost:3306"; 
+// database name $db_name = "ecshop"; 
+// database username $db_user = "root"; 
+// database password $db_pass = ""; 
+// table prefix $prefix = "ecs_"; 
+$timezone = "Asia/Shanghai"; 
+$cookie_path = "/"; 
+$cookie_domain = ""; 
+$session = "1440"; 
+define('EC_CHARSET','utf-8'); 
+define('ADMIN_PATH','admin'); 
+define('AUTH_KEY', 'this is a key'); 
+define('OLD_AUTH_KEY', ''); 
+define('API_TIME', ''); 
+?>
+复制代码
+上面是config.php中的代码，主要是配置了一些数据库的信息。
+
+包括数据库名，用户密码，前缀等等。后面会用到这些信息。
+
+我们来继续研究init.php
+
+复制代码
+require(ROOT_PATH . 'includes/inc_constant.php'); 
+require(ROOT_PATH . 'includes/cls_ecshop.php'); 
+require(ROOT_PATH . 'includes/cls_error.php'); 
+require(ROOT_PATH . 'includes/lib_time.php'); 
+require(ROOT_PATH . 'includes/lib_base.php'); 
+require(ROOT_PATH . 'includes/lib_common.php'); 
+require(ROOT_PATH . 'includes/lib_main.php'); 
+require(ROOT_PATH . 'includes/lib_insert.php'); 
+require(ROOT_PATH . 'includes/lib_goods.php'); 
+require(ROOT_PATH . 'includes/lib_article.php');
+复制代码
+init.php引入了很多核心文件和类。可以调用其中的方法，初始化对象等等。
+
+复制代码
+/* 创建 ECSHOP 对象 */ 
+//echo $db_name;exit; 
+$ecs = new ECS($db_name, $prefix); 
+define('DATA_DIR', $ecs->data_dir()); 
+define('IMAGE_DIR', $ecs->image_dir()); 
+/* 初始化数据库类 */ 
+require(ROOT_PATH . 'includes/cls_mysql.php'); 
+$db = new cls_mysql($db_host, $db_user, $db_pass, $db_name); 
+$db->set_disable_cache_tables(array($ecs->table('sessions'), 
+$ecs->table('sessions_data'), 
+$ecs->table('cart'))); 
+$db_host = $db_user = $db_pass = $db_name = NULL; 
+/* 创建错误处理对象 */ 
+$err = new ecs_error('message.dwt'); 
+/* 载入系统参数 */ 
+$_CFG = load_config(); 
+/* 载入语言文件 */ 
+require(ROOT_PATH . 'languages/' . $_CFG['lang'] . '/common.php');
+复制代码
+进行一些初始化操作，包括创建ecshop对象，连接数据库，创建错误处理对象，载入系统参数与语言文件等等。
+这里就不深入追究了。想追究的话，可以进一步深入探寻。
+
+复制代码
+if (!defined('INIT_NO_USERS'))
+{ 
+/* 初始化session */ 
+include(ROOT_PATH . 'includes/cls_session.php'); 
+$sess = new cls_session($db, $ecs->table('sessions'), $ecs->table('sessions_data')); define('SESS_ID', $sess->get_session_id());
+}
+复制代码
+引入session类，并进行初始化。
+
+复制代码
+if (!defined('INIT_NO_SMARTY'))
+{ 
+header('Cache-control: private'); 
+header('Content-type: text/html; charset='.EC_CHARSET); 
+/* 创建 Smarty 对象。*/ 
+require(ROOT_PATH . 'includes/cls_template.php'); 
+$smarty = new cls_template; 
+$smarty->cache_lifetime = $_CFG['cache_time']; 
+$smarty->template_dir   = ROOT_PATH . 'themes/' . $_CFG['template']; 
+//echo $_CFG['template'];exit; 
+$smarty->cache_dir      = ROOT_PATH . 'temp/caches'; $smarty->compile_dir    = ROOT_PATH . 'temp/compiled'; if ((DEBUG_MODE & 2) == 2)
+    { 
+    $smarty->direct_output = true; $smarty->force_compile = true;
+    } else { 
+    $smarty->direct_output = false; 
+    $smarty->force_compile = false;
+    } 
+    $smarty->assign('lang', $_LANG); 
+    $smarty->assign('ecs_charset', EC_CHARSET); 
+    if (!empty($_CFG['stylename']))
+    { 
+    $smarty->assign('ecs_css_path', 'themes/' . $_CFG['template'] . '/style_' . $_CFG['stylename'] . '.css');
+    } else { 
+    $smarty->assign('ecs_css_path', 'themes/' . $_CFG['template'] . '/style.css');
+    }
+}
+复制代码
+配置smarty信息。Ecshop中运用的是smarty模板技术，这与ZF框架还是有一分相似的。
+
+这些配置信息，都是从上面的数据中获取的，默认的模板是default，可以到相应的文件中进行修改。注意会有缓存。要清理缓存才能看到效果。
+
+复制代码
+if (!defined('INIT_NO_USERS'))
+{ 
+/* 会员信息 */ 
+$user =& init_users(); 
+if (!isset($_SESSION['user_id']))
+    { 
+    /* 获取投放站点的名称 */ 
+    $site_name = isset($_GET['from'])   ? $_GET['from'] : addslashes($_LANG['self_site']); 
+    $from_ad = !empty($_GET['ad_id']) ? intval($_GET['ad_id']) : 0; $_SESSION['from_ad'] = $from_ad; 
+    // 用户点击的广告ID 
+    $_SESSION['referer'] = stripslashes($site_name); 
+    // 用户来源 
+    unset($site_name); 
+    if (!defined('INGORE_VISIT_STATS'))
+        {
+            visit_stats();
+        }
+    } if (empty($_SESSION['user_id']))
+    { 
+    if ($user->get_cookie())
+        { /* 如果会员已经登录并且还没有获得会员的帐户余额、积分以及优惠券 */ if ($_SESSION['user_id'] > 0)
+            {
+                update_user_info();
+            }
+        } else { $_SESSION['user_id']     = 0; $_SESSION['user_name']   = ''; $_SESSION['email']       = ''; 
+        $_SESSION['user_rank']   = 0; 
+        $_SESSION['discount']    = 1.00; 
+        if (!isset($_SESSION['login_fail']))
+            { 
+            $_SESSION['login_fail'] = 0;
+            }
+        }
+    } 
+    /* 设置推荐会员 */ 
+    if (isset($_GET['u']))
+    {
+        set_affiliate();
+    } 
+    /* session 不存在，检查cookie */ 
+    if (!empty($_COOKIE['ECS']['user_id']) && !empty($_COOKIE['ECS']['password']))
+    { 
+    // 找到了cookie, 验证cookie信息 
+    $sql = 'SELECT user_id, user_name, password ' .' FROM ' .$ecs->table('users') ." WHERE user_id = '" . intval($_COOKIE['ECS']['user_id']) . "' AND password = '" .$_COOKIE['ECS']['password']. "'"; $row = $db->GetRow($sql); 
+    if (!$row)
+        { 
+        // 没有找到这个记录 
+        $time = time() - 3600; setcookie("ECS[user_id]",  '', $time, '/'); setcookie("ECS[password]", '', $time, '/');
+        } else { 
+        $_SESSION['user_id'] = $row['user_id']; 
+        $_SESSION['user_name'] = $row['user_name'];
+            update_user_info();
+        }
+    } 
+    if (isset($smarty))
+    { 
+    $smarty->assign('ecs_session', $_SESSION);
+    }
+}
+复制代码
+一些会员信息的设置。这些都是公共的信息。
+等等。
+
+以上是init.php文件中的主要内容。
+
+下面继续转战index.php中。
+
+复制代码
+if ((DEBUG_MODE & 2) != 2)
+{ 
+$smarty->caching = true;
+} 
+$ua = strtolower($_SERVER['HTTP_USER_AGENT']); 
+$uachar = "/(nokia|sony|ericsson|mot|samsung|sgh|lg|philips|panasonic|alcatel|lenovo|cldc|midp|mobile)/i"; 
+if(($ua == '' || preg_match($uachar, $ua))&& !strpos(strtolower($_SERVER['REQUEST_URI']),'wap'))
+{ 
+$Loaction = 'mobile/'; 
+if (!empty($Loaction))
+    {
+        ecs_header("Location: $Loaction\n"); exit;
+    }
+}
+复制代码
+上述代码，大概就是为各大手机厂商进行设计的。收到上述信息，就跳转到手机商城页面。Ecshop专门为手机设计了相应的界面。功能还是PHP来实现的。
+
+复制代码
+/*------------------------------------------------------ */ 
+//-- Shopex系统地址转换 
+/*------------------------------------------------------ */ 
+if (!empty($_GET['gOo']))
+{ if (!empty($_GET['gcat']))
+    { /* 商品分类。*/$Loaction = 'category.php?id=' . $_GET['gcat'];
+    } elseif (!empty($_GET['acat']))
+    { /* 文章分类。*/ $Loaction = 'article_cat.php?id=' . $_GET['acat'];
+    } elseif (!empty($_GET['goodsid']))
+    { /* 商品详情。*/ $Loaction = 'goods.php?id=' . $_GET['goodsid'];
+    } elseif (!empty($_GET['articleid']))
+    { /* 文章详情。*/ $Loaction = 'article.php?id=' . $_GET['articleid'];
+    } if (!empty($Loaction))
+    {
+        ecs_header("Location: $Loaction\n"); exit;
+    }
+}
+复制代码
+这是跳转功能，收到这些请求，就会跳转到相应的界面。
+
+复制代码
+/*------------------------------------------------------ */ 
+//-- 判断是否存在缓存，如果存在则调用缓存，反之读取相应内容 
+/*------------------------------------------------------ */ 
+/* 缓存编号 */ 
+$cache_id = sprintf('%X', crc32($_SESSION['user_rank'] . '-' . $_CFG['lang'])); 
+if (!$smarty->is_cached('index.dwt', $cache_id))
+{
+    assign_template(); 
+    $position = assign_ur_here(); 
+    $smarty->assign('page_title', $position['title']); 
+    // 页面标题 
+    $smarty->assign('ur_here', $position['ur_here']); 
+    // 当前位置 
+    /* meta information */ 
+    $smarty->assign('keywords', htmlspecialchars($_CFG['shop_keywords'])); 
+    $smarty->assign('description', htmlspecialchars($_CFG['shop_desc'])); 
+    $smarty->assign('flash_theme', $_CFG['flash_theme']); 
+    // Flash轮播图片模板 
+    $smarty->assign('feed_url',        ($_CFG['rewrite'] == 1) ? 'feed.xml' : 'feed.php'); 
+    // RSS URL $smarty->assign('categories',      get_categories_tree()); 
+    // 分类树 $smarty->assign('helps',           get_shop_help()); 
+    // 网店帮助 $smarty->assign('top_goods',       get_top10()); 
+    // 销售排行 $smarty->assign('best_goods',      get_recommend_goods('best')); 
+    // 推荐商品 $smarty->assign('new_goods',       get_recommend_goods('new')); 
+    // 最新商品 $smarty->assign('hot_goods',       get_recommend_goods('hot')); 
+    // 热点文章 $smarty->assign('promotion_goods', get_promote_goods()); 
+    // 特价商品 $smarty->assign('brand_list', get_brands()); 
+    $smarty->assign('promotion_info',  get_promotion_info()); 
+    // 增加一个动态显示所有促销信息的标签栏 
+    $smarty->assign('invoice_list',    index_get_invoice_query()); 
+    // 发货查询 $smarty->assign('new_articles',    index_get_new_articles()); 
+    // 最新文章 $smarty->assign('group_buy_goods', index_get_group_buy()); 
+    // 团购商品 $smarty->assign('auction_list',    index_get_auction()); 
+    // 拍卖活动 $smarty->assign('shop_notice', $_CFG['shop_notice']); 
+    // 商店公告 
+    /* 首页主广告设置 */
+    $smarty->assign('index_ad', $_CFG['index_ad']); 
+    if ($_CFG['index_ad'] == 'cus')
+    { 
+    $sql = 'SELECT ad_type, content, url FROM ' . $ecs->table("ad_custom") . ' WHERE ad_status = 1'; $ad = $db->getRow($sql, true); 
+    $smarty->assign('ad', $ad);
+    } 
+    /* links */ 
+    $links = index_get_links(); 
+    $smarty->assign('img_links', $links['img']); 
+    $smarty->assign('txt_links', $links['txt']); 
+    $smarty->assign('data_dir',        DATA_DIR); 
+    // 数据目录 
+    /* 首页推荐分类 */ 
+    $cat_recommend_res = $db->getAll("SELECT c.cat_id, c.cat_name, cr.recommend_type FROM " . $ecs->table("cat_recommend") . " AS cr INNER JOIN " . $ecs->table("category") . " AS c ON cr.cat_id=c.cat_id"); 
+    if (!empty($cat_recommend_res))
+    { 
+    $cat_rec_array = array(); 
+    foreach($cat_recommend_res as $cat_recommend_data)
+        { 
+        $cat_rec[$cat_recommend_data['recommend_type']][] = array('cat_id' => $cat_recommend_data['cat_id'], 'cat_name' => $cat_recommend_data['cat_name']);
+        } 
+        $smarty->assign('cat_rec', $cat_rec);
+    } 
+    /* 页面中的动态内容 */ 
+    assign_dynamic('index');
+} 
+$smarty->display('index.dwt', $cache_id);
+复制代码
+如果有缓存，会读取缓存中的信息，如果没有则重新执行一次查询，并用smarty将数据导入到视图界面。默认为themes目录下的default目录中的index.dwt文件。
+
+复制代码
+/**
+ * 调用发货单查询
+ *
+ * @access  private
+ * @return  array */ function index_get_invoice_query()
+{ 
+$sql = 'SELECT o.order_sn, o.invoice_no, s.shipping_code FROM ' . $GLOBALS['ecs']->table('order_info') . ' AS o' .
+            ' LEFT JOIN ' . $GLOBALS['ecs']->table('shipping') . ' AS s ON s.shipping_id = o.shipping_id' .
+            " WHERE invoice_no > '' AND shipping_status = " . SS_SHIPPED .
+            ' ORDER BY shipping_time DESC LIMIT 10'; $all = $GLOBALS['db']->getAll($sql); 
+            foreach ($all AS $key => $row)
+    { 
+    $plugin = ROOT_PATH . 'includes/modules/shipping/' . $row['shipping_code'] . '.php'; 
+    if (file_exists($plugin))
+        { 
+        include_once($plugin); $shipping = new $row['shipping_code']; 
+        $all[$key]['invoice_no'] = $shipping->query((string)$row['invoice_no']);
+        }
+    } 
+    clearstatcache();
+    return $all;
+} 
+/**
+ * 获得最新的文章列表。
+ *
+ * @access  private
+ * @return  array */ 
+ function index_get_new_articles()
+{ 
+$sql = 'SELECT a.article_id, a.title, ac.cat_name, a.add_time, a.file_url, a.open_type, ac.cat_id, ac.cat_name ' .
+            ' FROM ' . $GLOBALS['ecs']->table('article') . ' AS a, ' . $GLOBALS['ecs']->table('article_cat') . ' AS ac' .
+            ' WHERE a.is_open = 1 AND a.cat_id = ac.cat_id AND ac.cat_type = 1' .
+            ' ORDER BY a.article_type DESC, a.add_time DESC LIMIT ' . $GLOBALS['_CFG']['article_number']; 
+            $res = $GLOBALS['db']->getAll($sql); 
+            $arr = array(); 
+            foreach ($res AS $idx => $row)
+    { 
+    $arr[$idx]['id']          = $row['article_id']; $arr[$idx]['title']       = $row['title']; 
+    $arr[$idx]['short_title'] = $GLOBALS['_CFG']['article_title_length'] > 0 ? sub_str($row['title'], $GLOBALS['_CFG']['article_title_length']) : $row['title']; 
+    $arr[$idx]['cat_name']    = $row['cat_name']; $arr[$idx]['add_time']    = local_date($GLOBALS['_CFG']['date_format'], $row['add_time']); $arr[$idx]['url']         = $row['open_type'] != 1 ? build_uri('article', array('aid' => $row['article_id']), $row['title']) : trim($row['file_url']); 
+    $arr[$idx]['cat_url']     = build_uri('article_cat', array('acid' => $row['cat_id']), $row['cat_name']);
+    } return $arr;
+} 
+/**
+ * 获得最新的团购活动
+ *
+ * @access  private
+ * @return  array */ 
+ function index_get_group_buy()
+{ 
+$time = gmtime(); $limit = get_library_number('group_buy', 'index'); 
+$group_buy_list = array(); if ($limit > 0)
+    { 
+    $sql = 'SELECT gb.act_id AS group_buy_id, gb.goods_id, gb.ext_info, gb.goods_name, g.goods_thumb, g.goods_img ' .
+                'FROM ' . $GLOBALS['ecs']->table('goods_activity') . ' AS gb, ' . $GLOBALS['ecs']->table('goods') . ' AS g ' .
+                "WHERE gb.act_type = '" . GAT_GROUP_BUY . "' " .
+                "AND g.goods_id = gb.goods_id " .
+                "AND gb.start_time <= '" . $time . "' " .
+                "AND gb.end_time >= '" . $time . "' " .
+                "AND g.is_delete = 0 " .
+                "ORDER BY gb.act_id DESC " .
+                "LIMIT $limit" ; $res = $GLOBALS['db']->query($sql); while ($row = $GLOBALS['db']->fetchRow($res))
+        { 
+        /* 如果缩略图为空，使用默认图片 */ 
+        $row['goods_img'] = get_image_path($row['goods_id'], $row['goods_img']); 
+        $row['thumb'] = get_image_path($row['goods_id'], $row['goods_thumb'], true); /* 根据价格阶梯，计算最低价 */ 
+        $ext_info = unserialize($row['ext_info']); 
+        $price_ladder = $ext_info['price_ladder']; 
+        if (!is_array($price_ladder) || empty($price_ladder))
+            { 
+            $row['last_price'] = price_format(0);
+            } else { 
+            foreach ($price_ladder AS $amount_price)
+                { 
+                $price_ladder[$amount_price['amount']] = $amount_price['price'];
+                }
+            } 
+            ksort($price_ladder); 
+            $row['last_price'] = price_format(end($price_ladder)); 
+            $row['url'] = build_uri('group_buy', array('gbid' => $row['group_buy_id'])); 
+            $row['short_name']   = $GLOBALS['_CFG']['goods_name_length'] > 0 ? sub_str($row['goods_name'], $GLOBALS['_CFG']['goods_name_length']) : $row['goods_name']; 
+            $row['short_style_name']   = add_style($row['short_name'],''); $group_buy_list[] = $row;
+        }
+    } 
+    return $group_buy_list;
+} 
+/**
+ * 取得拍卖活动列表
+ * @return  array */ 
+ function index_get_auction()
+{ 
+$now = gmtime(); 
+$limit = get_library_number('auction', 'index'); $sql = "SELECT a.act_id, a.goods_id, a.goods_name, a.ext_info, g.goods_thumb ".
+            "FROM " . $GLOBALS['ecs']->table('goods_activity') . " AS a," . $GLOBALS['ecs']->table('goods') . " AS g" .
+            " WHERE a.goods_id = g.goods_id" .
+            " AND a.act_type = '" . GAT_AUCTION . "'" .
+            " AND a.is_finished = 0" .
+            " AND a.start_time <= '$now'" .
+            " AND a.end_time >= '$now'" .
+            " AND g.is_delete = 0" .
+            " ORDER BY a.start_time DESC" .
+            " LIMIT $limit"; $res = $GLOBALS['db']->query($sql); $list = array(); while ($row = $GLOBALS['db']->fetchRow($res))
+    { 
+    $ext_info = unserialize($row['ext_info']); 
+    $arr = array_merge($row, $ext_info); 
+    $arr['formated_start_price'] = price_format($arr['start_price']); 
+    $arr['formated_end_price'] = price_format($arr['end_price']); 
+    $arr['thumb'] = get_image_path($row['goods_id'], $row['goods_thumb'], true); 
+    $arr['url'] = build_uri('auction', array('auid' => $arr['act_id'])); 
+    $arr['short_name']   = $GLOBALS['_CFG']['goods_name_length'] > 0 ? sub_str($arr['goods_name'], $GLOBALS['_CFG']['goods_name_length']) : $arr['goods_name']; 
+    $arr['short_style_name']   = add_style($arr['short_name'],''); $list[] = $arr;
+    } return $list;
+} 
+/**
+ * 获得所有的友情链接
+ *
+ * @access  private
+ * @return  array */ function index_get_links()
+{ $sql = 'SELECT link_logo, link_name, link_url FROM ' . $GLOBALS['ecs']->table('friend_link') . ' ORDER BY show_order'; $res = $GLOBALS['db']->getAll($sql); $links['img'] = $links['txt'] = array(); foreach ($res AS $row)
+    { if (!empty($row['link_logo']))
+        { 
+        $links['img'][] = array(
+            'name' => $row['link_name'],
+            'url'  => $row['link_url'],
+            'logo' => $row['link_logo']);
+        } else { 
+        $links['txt'][] = array(
+            'name' => $row['link_name'],
+            'url'  => $row['link_url']);
+        }
+    } 
+    return $links;
+}
+复制代码
+最后的是一些查询函数，查询数据库中的信息。并展示出来。
+
+ 
+
+下面来看看视图中的代码：
+
+复制代码
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml"> 
+ <head> <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+ <meta name="Keywords" content="{$keywords}" /> 
+<meta name="Description" content="{$description}" /> 
+<!-- TemplateBeginEditable name="doctitle" --> 
+<title>{$page_title}</title> 
+<!-- TemplateEndEditable --> 
+<!-- TemplateBeginEditable name="head" --> 
+<!-- TemplateEndEditable --> 
+<link rel="shortcut icon" href="favicon.ico" /> 
+<link rel="icon" href="animated_favicon.gif" type="image/gif" /> 
+<link href="{$ecs_css_path}" rel="stylesheet" type="text/css" />
+<link rel="alternate" type="application/rss+xml" title="RSS|{$page_title}" href="{$feed_url}" /> 
+{* 包含脚本文件 *}
+{insert_scripts files='common.js,index.js'} 
+</head> 
+<body> 
+<!-- #BeginLibraryItem "/library/page_header.lbi" -->
+<!-- #EndLibraryItem --> <div class="blank"></div> 
+<div class="block clearfix"> 
+<!--left start--> 
+<div class="AreaL"> 
+<!--站内公告 start--> 
+<div class="box"> 
+<div class="box_1"> 
+<h3><span>{$lang.shop_notice}</span></h3> 
+<div class="boxCenterList RelaArticle"> {$shop_notice} </div> 
+</div> </div> <div class="blank5"></div> 
+<!--站内公告 end--> 
+<!-- TemplateBeginEditable name="左边区域" --> 
+<!-- #BeginLibraryItem "/library/cart.lbi" --> 
+{insert_scripts files='transport.js'} 
+<div class="cart" id="ECS_CARTINFO"> {insert name='cart_info'} </div> 
+<div class="blank5"></div> 
+<!-- #EndLibraryItem --> 
+<!-- #BeginLibraryItem "/library/category_tree.lbi" --> 
+<div class="box"> <div class="box_1"> <div id="category_tree"> 
+<!--{foreach from=$categories item=cat}--> 
+<dl> <dt><a href="{$cat.url}">{$cat.name|escape:html}</a></dt> 
+<!--{foreach from=$cat.cat_id item=child}--> 
+<dd><a href="{$child.url}">{$child.name|escape:html}</a></dd> 
+<!--{foreach from=$child.cat_id item=childer}--> 
+<dd>&nbsp;&nbsp;<a href="{$childer.url}">{$childer.name|escape:html}</a></dd> 
+<!--{/foreach}--> <!--{/foreach}--> </dl> <!--{/foreach}--> </div>
+ </div> 
+ </div> 
+ <div class="blank5"></div> 
+ <!-- #EndLibraryItem --> 
+ <!-- #BeginLibraryItem "/library/top10.lbi" --> 
+ <div class="box"> <div class="box_2"> 
+ <div class="top10Tit"></div> 
+ <div class="top10List clearfix"> 
+ <!-- {foreach name=top_goods from=$top_goods item=goods}--> 
+ <ul class="clearfix"> <img src="../images/top_{$smarty.foreach.top_goods.iteration}.gif" class="iteration" /> 
+ <!-- {if $smarty.foreach.top_goods.iteration<4}--> 
+ <li class="topimg"> <a href="{$goods.url}"><img src="{$goods.thumb}" alt="{$goods.name|escape:html}" class="samllimg" /></a> </li> 
+ <!-- {/if} --> <li {if $smarty.foreach.top_goods.iteration<4}class="iteration1"{/if}> <a href="{$goods.url}" title="{$goods.name|escape:html}">{$goods.short_name}</a><br /> {$lang.shop_price}<font class="f1">{$goods.price}</font><br /> </li> </ul> <!-- {/foreach} --> </div> </div> </div> <div class="blank5"></div> <!-- #EndLibraryItem --> <!-- #BeginLibraryItem "/library/promotion_info.lbi" --> <!-- {if $promotion_info} --> <!-- 促销信息 --> <div class="box"> <div class="box_1"> <h3><span>{$lang.promotion_info}</span></h3> <div class="boxCenterList RelaArticle"> <!-- {foreach from=$promotion_info item=item key=key} --> <!-- {if $item.type eq "snatch"} --> <a href="snatch.php" title="{$lang.$item.type}">{$lang.snatch_promotion}</a> <!-- {elseif $item.type eq "group_buy"} --> <a href="group_buy.php" title="{$lang.$item.type}">{$lang.group_promotion}</a> <!-- {elseif $item.type eq "auction"} --> <a href="auction.php" title="{$lang.$item.type}">{$lang.auction_promotion}</a> <!-- {elseif $item.type eq "favourable"} --> <a href="activity.php" title="{$lang.$item.type}">{$lang.favourable_promotion}</a> <!-- {/if} --> <a href="{$item.url}" title="{$lang.$item.type} {$item.act_name}{$item.time}" style="background:none; padding-left:0px;">{$item.act_name}</a><br /> <!-- {/foreach} --> </div> </div> </div> <div class="blank5"></div> <!-- {/if} --> <!-- #EndLibraryItem --> <!-- #BeginLibraryItem "/library/order_query.lbi" --> <!--{if empty($order_query)}--> <script>var invalid_order_sn = "{$lang.invalid_order_sn}"</script> <div class="box"> <div class="box_1"> <h3><span>{$lang.order_query}</span></h3> <div class="boxCenterList"> <form name="ecsOrderQuery"> <input type="text" name="order_sn" class="inputBg" /><br /> <div class="blank5"></div> <input type="button" value="{$lang.query_order}" class="bnt_blue_2" onclick="orderQuery()" /> </form> <div id="ECS_ORDER_QUERY" style="margin-top:8px;"> <!--{else}--> <!--{if $order_query.user_id}--> <b>{$lang.order_number}：</b><a href="user.php?act=order_detail&order_id={$order_query.order_id}" class="f6">{$order_query.order_sn}</a><br> <!--{else}--> <b>{$lang.order_number}：</b>{$order_query.order_sn}<br> <!--{/if}--> <b>{$lang.order_status}：</b><br><font class="f1">{$order_query.order_status}</font><br> <!--{if $order_query.invoice_no }--> <b>{$lang.consignment}：</b>{$order_query.invoice_no}<br> <!--{/if}--> {if $order_query.shipping_date}：{$lang.shipping_date} {$order_query.shipping_date}<br> <!--{/if}--> <!--{/if}--> </div> </div> </div> </div> <div class="blank5"></div> <!-- #EndLibraryItem --> <!-- #BeginLibraryItem "/library/invoice_query.lbi" --> <!--{if $invoice_list}--> <style type="text/css"> .boxCenterList form{display:inline;} .boxCenterList form a{color:#404040; text-decoration:underline;} </style> <div class="box"> <div class="box_1"> <h3><span>{$lang.shipping_query}</span></h3> <div class="boxCenterList"> <!-- 发货单查询{foreach from=$invoice_list item=invoice} --> {$lang.order_number} {$invoice.order_sn}<br /> {$lang.consignment} {$invoice.invoice_no} <div class="blank"></div> <!-- 结束发货单查询{/foreach}--> </div> </div> </div> <div class="blank5"></div> <!-- {/if} --> <!-- #EndLibraryItem --> <!-- #BeginLibraryItem "/library/vote_list.lbi" --> {insert name='vote'} <!-- #EndLibraryItem --> <!-- #BeginLibraryItem "/library/email_list.lbi" --> <div class="box"> <div class="box_1"> <h3><span>{$lang.email_subscribe}</span></h3> <div class="boxCenterList RelaArticle"> <input type="text" id="user_email" class="inputBg" /><br /> <div class="blank5"></div> <input type="button" class="bnt_blue" value="{$lang.email_list_ok}" onclick="add_email_list();" /> <input type="button" class="bnt_bonus" value="{$lang.email_list_cancel}" onclick="cancel_email_list();" /> </div> </div> </div> <div class="blank5"></div> <script type="text/javascript"> var email = document.getElementById('user_email'); function add_email_list()
+{ if (check_email())
+  {
+    Ajax.call('user.php?act=email_list&job=add&email=' + email.value, '', rep_add_email_list, 'GET', 'TEXT');
+  }
+} function rep_add_email_list(text)
+{
+  alert(text);
+} function cancel_email_list()
+{ if (check_email())
+  {
+    Ajax.call('user.php?act=email_list&job=del&email=' + email.value, '', rep_cancel_email_list, 'GET', 'TEXT');
+  }
+} function rep_cancel_email_list(text)
+{
+  alert(text);
+} function check_email()
+{ if (Utils.isEmail(email.value))
+  { return true;
+  } else {
+    alert('{$lang.email_invalid}'); return false;
+  }
+} </script> <!-- #EndLibraryItem --> <!-- TemplateEndEditable --> </div> 
+<!--left end--> 
+<!--right start--> 
+<div class="AreaR">
+<!--焦点图和站内快讯 START--> 
+<div class="box clearfix"> 
+<div class="box_1 clearfix"> 
+<div class="f_l" id="focus"> 
+<!-- #BeginLibraryItem "/library/index_ad.lbi" -->
+<!-- #EndLibraryItem --> </div> <!--news--> 
+<div id="mallNews" class="f_r"> 
+<div class="NewsTit"></div> 
+<div class="NewsList tc"> 
+<!-- TemplateBeginEditable name="站内快讯上广告位（宽：210px）" --> 
+<!-- TemplateEndEditable --> <!-- #BeginLibraryItem "/library/new_articles.lbi" -->
+<!-- #EndLibraryItem --> </div> 
+</div> <!--news end--> </div> 
+</div> <div class="blank5">
+</div> 
+<!--焦点图和站内快讯 END--> 
+<!--今日特价，品牌 start--> 
+<div class="clearfix"> 
+<!--特价--> 
+<!-- #BeginLibraryItem "/library/recommend_promotion.lbi" -->
+<!-- #EndLibraryItem -->
+<!--品牌--> 
+<div class="box f_r brandsIe6"> 
+<div class="box_1 clearfix" id="brands"> 
+<!-- #BeginLibraryItem "/library/brands.lbi" -->
+<!-- #EndLibraryItem --> 
+</div> 
+</div> 
+</div> 
+<div class="blank5"></div> 
+<!-- TemplateBeginEditable name="右边主区域" --> 
+<!-- #BeginLibraryItem "/library/recommend_best.lbi" --> 
+<!-- {if $best_goods} --> <!-- {if $cat_rec_sign neq 1} --> 
+<div class="box"> 
+<div class="box_2 centerPadd"> 
+<div class="itemTit" id="itemBest"> 
+{if $cat_rec[1]} 
+<h2><a href="javascript:void(0)" onclick="change_tab_style('itemBest', 'h2', this);get_cat_recommend(1, 0);">{$lang.all_goods}</a></h2> 
+{foreach from=$cat_rec[1] item=rec_data} 
+<h2 class="h2bg"><a href="javascript:void(0)" onclick="change_tab_style('itemBest', 'h2', this);get_cat_recommend(1, {$rec_data.cat_id})">{$rec_data.cat_name}</a></h2>
+ {/foreach}
+      {/if} 
+      </div> 
+      <div id="show_best_area" class="clearfix goodsBox"> 
+      <!-- {/if} --> 
+      <!--{foreach from=$best_goods item=goods}--> 
+      <div class="goodsItem"> <span class="best"></span> <a href="{$goods.url}"><img src="{$goods.thumb}" alt="{$goods.name|escape:html}" class="goodsimg" /></a><br /> 
+      <p><a href="{$goods.url}" title="{$goods.name|escape:html}">{$goods.short_style_name}</a></p> <font class="f1"> 
+      <!-- {if $goods.promote_price neq ""} --> 
+      {$goods.promote_price} 
+      <!-- {else}--> 
+      {$goods.shop_price} 
+      <!--{/if}--> 
+      </font> 
+      </div> 
+      <!--{/foreach}--> 
+      <div class="more"><a href="../search.php?intro=best"><img src="images/more.gif" /></a></div> <!-- {if $cat_rec_sign neq 1} --> </div> </div> </div> 
+      <div class="blank5"></div> 
+      <!-- {/if} -->
+       <!-- {/if} --> 
+       <!-- #EndLibraryItem --> 
+       <!-- #BeginLibraryItem "/library/recommend_new.lbi" --> 
+       <!-- {if $new_goods} --> 
+       <!-- {if $cat_rec_sign neq 1} --> 
+       <div class="box"> 
+       <div class="box_2 centerPadd"> 
+       <div class="itemTit New" id="itemNew"> 
+       {if $cat_rec[2]} 
+       <h2><a href="javascript:void(0)" onclick="change_tab_style('itemNew', 'h2', this);get_cat_recommend(2, 0);">{$lang.all_goods}</a></h2> 
+       {foreach from=$cat_rec[2] item=rec_data} 
+       <h2 class="h2bg"><a href="javascript:void(0)" onclick="change_tab_style('itemNew', 'h2', this);get_cat_recommend(2, {$rec_data.cat_id})">{$rec_data.cat_name}</a></h2> 
+       {/foreach}
+      {/if} 
+      </div> <div id="show_new_area" class="clearfix goodsBox"> 
+      <!-- {/if} --> 
+      <!--{foreach from=$new_goods item=goods}--> 
+      <div class="goodsItem"> <span class="news"></span> <a href="{$goods.url}"><img src="{$goods.thumb}" alt="{$goods.name|escape:html}" class="goodsimg" /></a><br /> <p><a href="{$goods.url}" title="{$goods.name|escape:html}">{$goods.short_style_name}</a></p> <font class="f1"> 
+      <!-- {if $goods.promote_price neq ""} --> 
+      {$goods.promote_price} 
+      <!-- {else}--> 
+      {$goods.shop_price} 
+      <!--{/if}--> 
+      </font> 
+      </div> 
+      <!--{/foreach}--> <div class="more"><a href="../search.php?intro=new"><img src="images/more.gif" /></a></div>
+       <!-- {if $cat_rec_sign neq 1} --> 
+       </div> 
+       </div> 
+       </div> 
+       <div class="blank5"></div> 
+       <!-- {/if} --> <!-- {/if} --> <!-- #EndLibraryItem --> 
+       <!-- #BeginLibraryItem "/library/recommend_hot.lbi" --> 
+       <!-- {if $hot_goods} --> 
+       <!-- {if $cat_rec_sign neq 1} --> <div class="box"> <div class="box_2 centerPadd"> <div class="itemTit Hot" id="itemHot"> {if $cat_rec[3]} <h2><a href="javascript:void(0)" onclick="change_tab_style('itemHot', 'h2', this);get_cat_recommend(3, 0);">{$lang.all_goods}</a></h2> {foreach from=$cat_rec[3] item=rec_data} <h2 class="h2bg"><a href="javascript:void(0)" onclick="change_tab_style('itemHot', 'h2', this);get_cat_recommend(3, {$rec_data.cat_id})">{$rec_data.cat_name}</a></h2> {/foreach}
+      {/if} </div> <div id="show_hot_area" class="clearfix goodsBox"> <!-- {/if} --> <!--{foreach from=$hot_goods item=goods}--> <div class="goodsItem"> <span class="hot"></span> <a href="{$goods.url}"><img src="{$goods.thumb}" alt="{$goods.name|escape:html}" class="goodsimg" /></a><br /> <p><a href="{$goods.url}" title="{$goods.name|escape:html}">{$goods.short_style_name}</a></p> <font class="f1"> <!-- {if $goods.promote_price neq ""} --> {$goods.promote_price} <!-- {else}--> {$goods.shop_price} <!--{/if}--> </font> </div> <!--{/foreach}--> <div class="more"><a href="../search.php?intro=hot"><img src="images/more.gif" /></a></div> <!-- {if $cat_rec_sign neq 1} --> </div> </div> </div> <div class="blank5"></div> <!-- {/if} --> <!-- {/if} --> <!-- #EndLibraryItem --> <!-- #BeginLibraryItem "/library/auction.lbi" --> <!-- {if $auction_list} --> <div class="box"> <div class="box_1"> <h3><span>{$lang.auction_goods}</span><a href="auction.php"><img src="../images/more.gif"></a></h3> <div class="centerPadd"> <div class="clearfix goodsBox" style="border:none;"> <!--{foreach from=$auction_list item=auction}--> <div class="goodsItem"> <a href="{$auction.url}"><img src="{$auction.thumb}" alt="{$auction.goods_name|escape:html}" class="goodsimg" /></a><br /> <p><a href="{$auction.url}" title="{$auction.goods_name|escape:html}">{$auction.short_style_name|escape:html}</a></p> <font class="shop_s">{$auction.formated_start_price}</font> </div> <!--{/foreach}--> </div> </div> </div> </div> <div class="blank5"></div> <!-- {/if} --> <!-- #EndLibraryItem --> <!-- #BeginLibraryItem "/library/group_buy.lbi" --> <!-- {if $group_buy_goods} --> <div class="box"> <div class="box_1"> <h3><span>{$lang.group_buy_goods}</span><a href="group_buy.php"><img src="../images/more.gif"></a></h3> <div class="centerPadd"> <div class="clearfix goodsBox" style="border:none;"> <!--{foreach from=$group_buy_goods item=goods}--> <div class="goodsItem"> <a href="{$goods.url}"><img src="{$goods.thumb}" alt="{$goods.goods_name|escape:html}" class="goodsimg" /></a><br /> <p><a href="{$goods.url}" title="{$goods.goods_name|escape:html}">{$goods.short_style_name|escape:html}</a></p> <font class="shop_s">{$goods.last_price}
+      </font> 
+      </div> <!--{/foreach}--> </div> </div> </div> </div> <div class="blank5"></div>
+       <!-- {/if} --> 
+      <!-- #EndLibraryItem --> 
+      <!-- TemplateEndEditable --> </div> <!--right end--> </div> 
+      <div class="blank5"></div> 
+      <!--帮助--> 
+      <div class="block"> <div class="box"> <div class="helpTitBg clearfix"> 
+      <!-- #BeginLibraryItem "/library/help.lbi" -->
+      <!-- #EndLibraryItem --> </div> </div> </div> <div class="blank"></div> 
+      <!--帮助--> 
+      <!--友情链接 start--> <!--{if $img_links  or $txt_links }--> <div id="bottomNav" class="box"> <div class="box_1"> <div class="links clearfix"> 
+      <!--开始图片类型的友情链接{foreach from=$img_links item=link}--> 
+      <a href="{$link.url}" target="_blank" title="{$link.name}"><img src="{$link.logo}" alt="{$link.name}" border="0" /></a> 
+      <!--结束图片类型的友情链接{/foreach}--> 
+      <!-- {if $txt_links} --> 
+      <!--开始文字类型的友情链接{foreach from=$txt_links item=link}--> 
+      [<a href="{$link.url}" target="_blank" title="{$link.name}">{$link.name}</a>] 
+      <!--结束文字类型的友情链接{/foreach}--> 
+      <!-- {/if} --> </div> </div> </div> 
+      <!--{/if}--> 
+      <!--友情链接 end--> 
+      <div class="blank"></div> 
+      <!-- #BeginLibraryItem "/library/page_footer.lbi" --><!-- #EndLibraryItem --> 
+      </body> 
+      </html>
+复制代码
+通过smarty对数据进行分配。由此完成了页面的展示。
+
+进行二次开发的时候，可以修改界面。注意缓存问题。可以修改逻辑层的信息。掌握了其中的脉络之后，就可以对症下药。
+
+还是那句话，知道在哪里写代码，就是成功的一半了。

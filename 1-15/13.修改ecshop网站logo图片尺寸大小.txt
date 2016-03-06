@@ -1,0 +1,22 @@
+ecshop里面把logo的尺寸是写固定了的，大概在150*35的样子，如果设计的尺寸偏大，那么就会出现只能显示部分logo的情况，请的合作美工出于漂亮和完整传达意思的考虑，他把我的logo尺寸修改为150*52，这样的话logo并不能完全显示，尤其是底部logo只能显示大半部分，因此必须修改代码使得能容纳新版的logo图标。
+针对头部文件的修改，ecshop模板网在后台中修改，
+模板管理 -> 库项目管理 -> page_header.lbi 找到 "images/logo.gif"这部分代码，
+原文件如下：
+<div class="block clearfix">
+ <div class="f_l"><a href="../index.php" name="top"><img src="../images/logo.gif" /></a></div>
+ <div class="f_r log">
+系统并没有对图片的尺寸进行限制，修改如下：
+<div class="block clearfix">
+ <div class="f_l"><a href="../index.php" name="top"><img width="150" height="52" src="../images/logo.gif" /></a></div>
+ <div class="f_r log">
+ 
+针对底部的修改，在style.css中完成，
+找到
+   /*版权*/
+   #footer{background:url(images/logo1.gif) no-repeat 5% 50%; padding-left:200px; width:760px; margin:10px auto;}
+   #footer .text{background:url(images/footerLine.gif) no-repeat left center;  padding-left:50px; *padding-bottom:20px;}
+   #footer .text a{color:#404040; text-decoration:none;}
+这部分代码，做如下修改：
+   #footer{background:url(images/logo1.gif) no-repeat 5% 50%; padding-left:200px; height:52px; width:760px; margin:10px auto;}
+   #footer .text{background:url(images/footerLine.gif) no-repeat left center; padding-left:50px; *padding-bottom:20px;}
+   #footer .text a{color:#404040; text-

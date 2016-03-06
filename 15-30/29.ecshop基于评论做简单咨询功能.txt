@@ -1,0 +1,553 @@
+ecshop商品及文档都有评论的功能，而现在我们需要做一个咨询功能，这样比较正式的渠道来服务客户，参考现有的评论功能简单实现，后期继续扩展。
+增加前台展示以及提交表单
+1:goods.dwt增加以下代码,以引用咨询相关的模板
+<!– #BeginLibraryItem “/library/comments1.lbi” –><!– #EndLibraryItem –>
+2.复制/library/comments.lbi更名为comments1.lbi，内容稍微修改下
+1	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+2	{insert_scripts files='transport.js,utils.js'}
+3	<div id="ECS_COMMENT1"> {* ECSHOP 提醒您：动态载入comments_list1.lbi，显示评论列表和评论表单 *}{insert name='comments1' type=2 id=$id}</div>
+3./include/lib_insert.php增加函数
+1	/*购买前咨询*/
+2	 
+3	function insert_comments1($arr)
+4	{
+5	    $need_cache = $GLOBALS['smarty']->caching;
+6	    $need_compile = $GLOBALS['smarty']->force_compile;
+7	 
+8	    $GLOBALS['smarty']->caching = false;
+9	    $GLOBALS['smarty']->force_compile = true;
+10	 
+11	    /* 验证码相关设置 */
+12	    if ((intval($GLOBALS['_CFG']['captcha']) & CAPTCHA_COMMENT) && gd_version() > 0)
+13	    {
+14	        $GLOBALS['smarty']->assign('enabled_captcha', 1);
+15	        $GLOBALS['smarty']->assign('rand', mt_rand());
+16	    }
+17	    $GLOBALS['smarty']->assign('username',    stripslashes($_SESSION['user_name']));
+18	    $GLOBALS['smarty']->assign('email',        $_SESSION['email']);
+19	    $GLOBALS['smarty']->assign('comment_type', 2);
+20	    $GLOBALS['smarty']->assign('id',           $arr['id']);
+21	    $cmt = assign_comment($arr['id'],          $arr['type']);
+22	    $GLOBALS['smarty']->assign('comments',     $cmt['comments']);
+23	    $GLOBALS['smarty']->assign('pager',        $cmt['pager']);
+24	 
+25	    $val = $GLOBALS['smarty']->fetch('library/comments_list1.lbi');
+26	 
+27	    $GLOBALS['smarty']->caching = $need_cache;
+28	    $GLOBALS['smarty']->force_compile = $need_compile;
+29	 
+30	    return $val;
+31	}
+4.复制/library/comment_list.lbi更名为comment_list1.lbi,内容稍微修改
+1	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+2	<!--用户咨询 START-->
+3	     <div class="box">
+4	<div class="box_1">
+5	<h3><span class="text">用户咨询</span>({$lang.total}<font class="f1">{$pager.record_count}</font>用户咨询)</h3>
+6	 
+7	<div class="boxCenterList clearfix" style="height:1%;">
+8	       <ul class="comments">
+9	       <!-- {if $comments} -->
+10	       <!-- {foreach from=$comments item=comment} -->
+11	        <li class="word">
+12	        <font class="f2"><!-- {if $comment.username} -->{$comment.username|escape:html}<!-- {else} -->{$lang.anonymous}<!-- {/if} --></font> <font class="f3">( {$comment.add_time} )</font><br />
+13	        <img src="../images/stars{$comment.rank}.gif" alt="{$comment.comment_rank}"/>
+14	        <p>{$comment.content}</p>
+15	    <!-- {if $comment.re_content} -->
+16	        <p><font class="f1">{$lang.admin_username}</font>{$comment.re_content}</p>
+17	    <!-- {/if} -->
+18	        </li>
+19	        <!-- {/foreach} -->
+20	        <!--{else}-->
+21	        <li>目前没有任何用户咨询</li>
+22	        <!--{/if}-->
+23	       </ul>
+24	       <!--翻页 start-->
+25	       <div id="pagebar" class="f_r">
+26	        <form name="sel ectPageForm" action="{$smarty.server.PHP_SELF}" method="get">
+27	        <!-- {if $pager.styleid eq 0 } -->
+28	        <div id="pager">
+29	          {$lang.pager_1}{$pager.record_count}{$lang.pager_2}{$lang.pager_3}{$pager.page_count}{$lang.pager_4} <span> <a href="{$pager.page_first}">{$lang.page_first}</a> <a href="{$pager.page_prev}">{$lang.page_prev}</a> <a href="{$pager.page_next}">{$lang.page_next}</a> <a href="{$pager.page_last}">{$lang.page_last}</a> </span>
+30	            <!--{foreach from=$pager.search key=key item=item}-->
+31	            <input type="hidden" name="{$key}" value="{$item}" />
+32	            <!--{/foreach}-->
+33	        </div>
+34	        <!--{else}-->
+35	        <!--翻页 start-->
+36	         <div id="pager" class="pagebar">
+37	          <span class="f_l f6" style="margin-right:10px;">{$lang.total} <b>{$pager.record_count}</b> {$lang.user_comment_num}</span>
+38	          <!-- {if $pager.page_first} --><a href="{$pager.page_first}">1 ...</a><!-- {/if} -->
+39	          <!-- {if $pager.page_prev} --><a class="prev" href="{$pager.page_prev}">{$lang.page_prev}</a><!-- {/if} -->
+40	          <!--{foreach from=$pager.page_number key=key item=item}-->
+41	                <!-- {if $pager.page eq $key} -->
+42	                <span class="page_now">{$key}</span>
+43	                <!-- {else} -->
+44	                <a href="{$item}">[{$key}]</a>
+45	                <!-- {/if} -->
+46	            <!--{/foreach}-->
+47	          <!-- {if $pager.page_next} --><a class="next" href="{$pager.page_next}">{$lang.page_next}</a><!-- {/if} -->
+48	          <!-- {if $pager.page_last} --><a class="last" href="{$pager.page_last}">...{$pager.page_count}</a><!-- {/if} -->
+49	          <!-- {if $pager.page_kbd} -->
+50	            <!--{foreach from=$pager.search key=key item=item}-->
+51	            <input type="hidden" name="{$key}" value="{$item}" />
+52	            <!--{/foreach}-->
+53	            <kbd style="float:left; margin-left:8px; position:relative; bottom:3px;"><input type="text" name="page" size="3" class="B_blue" /></kbd>
+54	            <!-- {/if} -->
+55	        </div>
+56	        <!--翻页 END-->
+57	        <!-- {/if} -->
+58	        </form>
+59	        <script type="Text/Javascript" language="JavaScript">
+60	        <!--
+61	        {literal}
+62	        function sel ectPage(sel)
+63	        {
+64	          sel.form.submit();
+65	        }
+66	        {/literal}
+67	        //-->
+68	        </script>
+69	      </div>
+70	      <!--翻页 END-->
+71	      <div class="blank5"></div>
+72	      <!--咨询表单 start-->
+73	      <div class="commentsList">
+74	      <form action="javascript:;" onsubmit="submitComment1(this)" method="post"name="commentForm1" id="commentForm1">
+75	       <table width="700" border="0" cellspacing="5" cellpadding="0">
+76	 
+77	        <tr>
+78	          <td align="right">E-mail：</td>
+79	          <td>
+80	          <input type="text" name="email" id="email"  maxlength="100" value="{$smarty.session.email|escape}" class="inputBorder"/>
+81	          </td>
+82	        </tr>
+83	 
+84	        <tr>
+85	          <td align="right" valign="top">{$lang.comment_content}：</td>
+86	          <td>
+87	          <textarea name="content" class="inputBorder" style="height:50px; width:560px;"></textarea>
+88	          <input type="hidden" name="cmt_type" value="2" />
+89	          <input type="hidden" name="id" value="{$id}" />
+90	          </td>
+91	        </tr>
+92	        <tr>
+93	          <td colspan="2">
+94	          <!-- 判断是否启用验证码{if $enabled_captcha} -->
+95	          <div style="padding-left:15px; text-align:left; float:left;">
+96	          {$lang.comment_captcha}：<input type="text" name="captcha" class="inputBorder" style="width:50px; margin-left:5px;"/>
+97	          <img src="captcha.php?{$rand}" alt="captcha" class="captcha"onClick="this.src='captcha.php?'+Math.random()">
+98	          </div>
+99	          <!-- {/if} -->
+100	          <input name="" type="submit"  value=" " class="f_r" style="border:none; background:url(../images/commentsBnt.gif); width:75px; height:21px; margin-right:8px;">
+101	          </td>
+102	        </tr>
+103	      </table>
+104	      </form>
+105	      </div>
+106	      <!--咨询表单 end-->
+107	      </div>
+108	     </div>
+109	    </div>
+110	    <div class="blank5"></div>
+111	  <!--用户咨询 END-->
+112	<script type="text/javascript">
+113	//<![CDATA[
+114	{foreach from=$lang.cmt_lang item=item key=key}
+115	var {$key} = "{$item}";
+116	{/foreach}
+117	{literal}
+118	/**
+119	* 提交咨询信息
+120	*/
+121	function submitComment1(frm)
+122	{
+123	  var cmt = new Object;
+124	 
+125	  cmt.email           = frm.elements['email'].value;
+126	  cmt.content         = frm.elements['content'].value;
+127	  cmt.type            = frm.elements['cmt_type'].value;
+128	  cmt.id              = frm.elements['id'].value;
+129	  cmt.enabled_captcha = frm.elements['enabled_captcha'] ? frm.elements['enabled_captcha'].value : '0';
+130	  cmt.captcha         = frm.elements['captcha'] ? frm.elements['captcha'].value : '';
+131	  cmt.rank            = 5;
+132	 
+133	  if (cmt.email.length > 0)
+134	  {
+135	     if (!(Utils.isEmail(cmt.email)))
+136	     {
+137	        alert(cmt_error_email);
+138	        return false;
+139	      }
+140	   }
+141	   else
+142	   {
+143	        alert(cmt_empty_email);
+144	        return false;
+145	   }
+146	   if (cmt.content.length == 0)
+147	   {
+148	      alert(cmt_empty_content);
+149	      return false;
+150	   }
+151	   if (cmt.enabled_captcha > 0 && cmt.captcha.length == 0 )
+152	   {
+153	      alert(captcha_not_null);
+154	      return false;
+155	   }
+156	   Ajax.call('comment1.php', 'cmt=' + cmt.toJSONString(), commentRespone1, 'POST', 'JSON');
+157	   return false;
+158	}
+159	/**
+160	* 处理提交咨询的反馈信息
+161	*/
+162	  function commentRespone1(result)
+163	  {
+164	    if (result.message)
+165	    {
+166	      alert(result.message);
+167	    }
+168	    if (result.error == 0)
+169	    {
+170	      var layer = document.getElementById('ECS_COMMENT1');
+171	      if (layer)
+172	      {
+173	        layer.innerHTML = result.content;
+174	      }
+175	    }
+176	  }
+177	{/literal}
+178	//]]>
+179	</script>
+5.复制/comment.php重命名为comment1.php,内容稍作修改
+查看源代码
+打印帮助
+1	<?php
+2	 
+3	/**
+4	 * ECSHOP 提交用户评论
+5	 * ============================================================================
+6	 * 版权所有 2005-2010 上海商派网络科技有限公司，并保留所有权利。
+7	 * 网站地址: http://www.ecshop.com；
+8	 * ----------------------------------------------------------------------------
+9	 * 这不是一个自由软件！您只能在不用于商业目的的前提下对程序代码进行修改和
+10	 * 使用；不允许对程序代码以任何形式任何目的的再发布。
+11	 * ============================================================================
+12	 * $Author: liuhui $
+13	 * $Id: comment.php 17063 2010-03-25 06:35:46Z liuhui $
+14	*/
+15	 
+16	define('IN_ECS', true);
+17	 
+18	require(dirname(__FILE__) . '/includes/init.php');
+19	require(ROOT_PATH . 'includes/cls_json.php');
+20	 
+21	if (!isset($_REQUEST['cmt']) && !isset($_REQUEST['act']))
+22	{
+23	    /* 只有在没有提交评论内容以及没有act的情况下才跳转 */
+24	    ecs_header("Location: ./\n");
+25	    exit;
+26	}
+27	$_REQUEST['cmt'] = isset($_REQUEST['cmt']) ? json_str_iconv($_REQUEST['cmt']) : '';
+28	 
+29	$json   = new JSON;
+30	$result = array('error' => 0, 'message' => '', 'content' => '');
+31	 
+32	if (empty($_REQUEST['act']))
+33	{
+34	    /*
+35	     * act 参数为空
+36	     * 默认为添加评论内容
+37	     */
+38	    $cmt  = $json->decode($_REQUEST['cmt']);
+39	    $cmt->page = 1;
+40	    $cmt->id   = !empty($cmt->id)   ? intval($cmt->id) : 0;
+41	    $cmt->type = !empty($cmt->type) ? intval($cmt->type) : 0;
+42	 
+43	    if (empty($cmt) || !isset($cmt->type) || !isset($cmt->id))
+44	    {
+45	        $result['error']   = 1;
+46	        $result['message'] = $_LANG['invalid_comments'];
+47	    }
+48	    elseif (!is_email($cmt->email))
+49	    {
+50	        $result['error']   = 1;
+51	        $result['message'] = $_LANG['error_email'];
+52	    }
+53	    else
+54	    {
+55	        if ((intval($_CFG['captcha']) & CAPTCHA_COMMENT) && gd_version() > 0)
+56	        {
+57	            /* 检查验证码 */
+58	            include_once('includes/cls_captcha.php');
+59	 
+60	            $validator = new captcha();
+61	            if (!$validator->check_word($cmt->captcha))
+62	            {
+63	                $result['error']   = 1;
+64	                $result['message'] = $_LANG['invalid_captcha'];
+65	            }
+66	            else
+67	            {
+68	                $factor = intval($_CFG['comment_factor']);
+69	                if ($cmt->type == 0 && $factor > 0)
+70	                {
+71	                    /* 只有商品才检查评论条件 */
+72	                    switch ($factor)
+73	                    {
+74	                        case COMMENT_LOGIN :
+75	                            if ($_SESSION['user_id'] == 0)
+76	                            {
+77	                                $result['error']   = 1;
+78	                                $result['message'] = $_LANG['comment_login'];
+79	                            }
+80	                            break;
+81	 
+82	                        case COMMENT_CUSTOM :
+83	                            if ($_SESSION['user_id'] > 0)
+84	                            {
+85	                                $sql = "SELECT o.order_id FROM " . $ecs->table('order_info') . " AS o ".
+86	                                       " WHERE user_id = '" . $_SESSION['user_id'] . "'".
+87	                                       " AND o.order_status = '" . OS_CONFIRMED . "' ".
+88	                                       " AND (o.pay_status = '" . PS_PAYED . "' OR o.pay_status = '" . PS_PAYING . "') ".
+89	                                       " AND (o.shipping_status = '" . SS_SHIPPED ."' OR o.shipping_status = '" . SS_RECEIVED . "') ".
+90	                                       " LIMIT 1";
+91	 
+92	                                 $tmp = $db->getOne($sql);
+93	                                 if (empty($tmp))
+94	                                 {
+95	                                    $result['error']   = 1;
+96	                                    $result['message'] = $_LANG['comment_custom'];
+97	                                 }
+98	                            }
+99	                            else
+100	                            {
+101	                                $result['error'] = 1;
+102	                                $result['message'] = $_LANG['comment_custom'];
+103	                            }
+104	                            break;
+105	 
+106	                        case COMMENT_BOUGHT :
+107	                            if ($_SESSION['user_id'] > 0)
+108	                            {
+109	                                $sql = "SELECT o.order_id".
+110	                                       " FROM " . $ecs->table('order_info'). " AS o, ".
+111	                                       $ecs->table('order_goods') . " AS og ".
+112	                                       " WHERE o.order_id = og.order_id".
+113	                                       " AND o.user_id = '" . $_SESSION['user_id'] . "'".
+114	                                       " AND og.goods_id = '" . $cmt->id . "'".
+115	                                       " AND o.order_status = '" . OS_CONFIRMED . "' ".
+116	                                       " AND (o.pay_status = '" . PS_PAYED . "' OR o.pay_status = '" . PS_PAYING . "') ".
+117	                                       " AND (o.shipping_status = '" . SS_SHIPPED ."' OR o.shipping_status = '" . SS_RECEIVED . "') ".
+118	                                       " LIMIT 1";
+119	                                 $tmp = $db->getOne($sql);
+120	                                 if (empty($tmp))
+121	                                 {
+122	                                    $result['error']   = 1;
+123	                                    $result['message'] = $_LANG['comment_brought'];
+124	                                 }
+125	                            }
+126	                            else
+127	                            {
+128	                                $result['error']   = 1;
+129	                                $result['message'] = $_LANG['comment_brought'];
+130	                            }
+131	                    }
+132	                }
+133	 
+134	                /* 无错误就保存留言 */
+135	                if (empty($result['error']))
+136	                {
+137	                    add_comment($cmt);
+138	                }
+139	            }
+140	        }
+141	        else
+142	        {
+143	            /* 没有验证码时，用时间来限制机器人发帖或恶意发评论 */
+144	            if (!isset($_SESSION['send_time']))
+145	            {
+146	                $_SESSION['send_time'] = 0;
+147	            }
+148	 
+149	            $cur_time = gmtime();
+150	            if (($cur_time - $_SESSION['send_time']) < 30) // 小于30秒禁止发评论
+151	            {
+152	                $result['error']   = 1;
+153	                $result['message'] = $_LANG['cmt_spam_warning'];
+154	            }
+155	            else
+156	            {
+157	                $factor = intval($_CFG['comment_factor']);
+158	                if ($cmt->type == 0 && $factor > 0)
+159	                {
+160	                    /* 只有商品才检查评论条件 */
+161	                    switch ($factor)
+162	                    {
+163	                        case COMMENT_LOGIN :
+164	                            if ($_SESSION['user_id'] == 0)
+165	                            {
+166	                                $result['error']   = 1;
+167	                                $result['message'] = $_LANG['comment_login'];
+168	                            }
+169	                            break;
+170	 
+171	                        case COMMENT_CUSTOM :
+172	                            if ($_SESSION['user_id'] > 0)
+173	                            {
+174	                                $sql = "SELECT o.order_id FROM " . $ecs->table('order_info') . " AS o ".
+175	                                       " WHERE user_id = '" . $_SESSION['user_id'] . "'".
+176	                                       " AND o.order_status = '" . OS_CONFIRMED . "' ".
+177	                                       " AND (o.pay_status = '" . PS_PAYED . "' OR o.pay_status = '" . PS_PAYING . "') ".
+178	                                       " AND (o.shipping_status = '" . SS_SHIPPED ."' OR o.shipping_status = '" . SS_RECEIVED . "') ".
+179	                                       " LIMIT 1";
+180	 
+181	                                 $tmp = $db->getOne($sql);
+182	                                 if (empty($tmp))
+183	                                 {
+184	                                    $result['error']   = 1;
+185	                                    $result['message'] = $_LANG['comment_custom'];
+186	                                 }
+187	                            }
+188	                            else
+189	                            {
+190	                                $result['error'] = 1;
+191	                                $result['message'] = $_LANG['comment_custom'];
+192	                            }
+193	                            break;
+194	 
+195	                        case COMMENT_BOUGHT :
+196	                            if ($_SESSION['user_id'] > 0)
+197	                            {
+198	                                $sql = "SELECT o.order_id".
+199	                                       " FROM " . $ecs->table('order_info'). " AS o, ".
+200	                                       $ecs->table('order_goods') . " AS og ".
+201	                                       " WHERE o.order_id = og.order_id".
+202	                                       " AND o.user_id = '" . $_SESSION['user_id'] . "'".
+203	                                       " AND og.goods_id = '" . $cmt->id . "'".
+204	                                       " AND o.order_status = '" . OS_CONFIRMED . "' ".
+205	                                       " AND (o.pay_status = '" . PS_PAYED . "' OR o.pay_status = '" . PS_PAYING . "') ".
+206	                                       " AND (o.shipping_status = '" . SS_SHIPPED ."' OR o.shipping_status = '" . SS_RECEIVED . "') ".
+207	                                       " LIMIT 1";
+208	                                 $tmp = $db->getOne($sql);
+209	                                 if (empty($tmp))
+210	                                 {
+211	                                    $result['error']   = 1;
+212	                                    $result['message'] = $_LANG['comment_brought'];
+213	                                 }
+214	                            }
+215	                            else
+216	                            {
+217	                                $result['error']   = 1;
+218	                                $result['message'] = $_LANG['comment_brought'];
+219	                            }
+220	                    }
+221	                }
+222	                /* 无错误就保存留言 */
+223	                if (empty($result['error']))
+224	                {
+225	                    add_comment($cmt);
+226	                    $_SESSION['send_time'] = $cur_time;
+227	                }
+228	            }
+229	        }
+230	    }
+231	}
+232	else
+233	{
+234	    /*
+235	     * act 参数不为空
+236	     * 默认为评论内容列表
+237	     * 根据 _GET 创建一个静态对象
+238	     */
+239	    $cmt = new stdClass();
+240	    $cmt->id   = !empty($_GET['id'])   ? intval($_GET['id'])   : 0;
+241	    $cmt->type = !empty($_GET['type']) ? intval($_GET['type']) : 0;
+242	    $cmt->page = !empty($_GET['page']) ? intval($_GET['page']) : 1;
+243	}
+244	 
+245	if ($result['error'] == 0)
+246	{
+247	    $comments = assign_comment($cmt->id, $cmt->type, $cmt->page);
+248	 
+249	    $smarty->assign('comment_type', $cmt->type);
+250	    $smarty->assign('id',           $cmt->id);
+251	    $smarty->assign('username',     $_SESSION['user_name']);
+252	    $smarty->assign('email',        $_SESSION['email']);
+253	    $smarty->assign('comments',     $comments['comments']);
+254	    $smarty->assign('pager',        $comments['pager']);
+255	 
+256	    /* 验证码相关设置 */
+257	    if ((intval($_CFG['captcha']) & CAPTCHA_COMMENT) && gd_version() > 0)
+258	    {
+259	        $smarty->assign('enabled_captcha', 1);
+260	        $smarty->assign('rand', mt_rand());
+261	    }
+262	 
+263	    $result['message'] = $_CFG['comment_check'] ? $_LANG['cmt_submit_wait'] :$_LANG['cmt_submit_done'];
+264	    $result['content'] = $smarty->fetch("library/comments_list1.lbi");
+265	}
+266	 
+267	echo $json->encode($result);
+268	 
+269	/*------------------------------------------------------ */
+270	//-- PRIVATE FUNCTION
+271	/*------------------------------------------------------ */
+272	 
+273	/**
+274	 * 添加评论内容
+275	 *
+276	 * @access  public
+277	 * @param   object  $cmt
+278	 * @return  void
+279	 */
+280	function add_comment($cmt)
+281	{
+282	    /* 评论是否需要审核 */
+283	    $status = 1 - $GLOBALS['_CFG']['comment_check'];
+284	 
+285	    $user_id = empty($_SESSION['user_id']) ? 0 : $_SESSION['user_id'];
+286	    $email = empty($cmt->email) ? $_SESSION['email'] : trim($cmt->email);
+287	    $user_name = empty($cmt->username) ? $_SESSION['user_name'] : trim($cmt->username);
+288	    $email = htmlspecialchars($email);
+289	    $user_name = htmlspecialchars($user_name);
+290	 
+291	    /* 保存评论内容 */
+292	    $sql = "INSERT INTO " .$GLOBALS['ecs']->table('comment') .
+293	           "(comment_type, id_value, email, user_name, content, comment_rank, add_time, ip_address, status, parent_id, user_id) VALUES " .
+294	           "('" .$cmt->type. "', '" .$cmt->id. "', '$email', '$user_name', '" .$cmt->content."', '".$cmt->rank."', ".gmtime().", '".real_ip()."', '$status', '0', '$user_id')";
+295	 
+296	    $result = $GLOBALS['db']->query($sql);
+297	    clear_cache_files('comments_list1.lbi');
+298	    /*if ($status > 0)
+299	    {
+300	        add_feed($GLOBALS['db']->insert_id(), COMMENT_GOODS);
+301	    }*/
+302	    return $result;
+303	}
+304	 
+305	?>
+6./js/common.js增加咨询分页js
+1	/* *
+2	*购买前咨询的翻页函数
+3	*/
+4	function gotoPage1(page, id, type)
+5	{
+6	  Ajax.call('comment1.php?act=gotopage', 'page=' + page + '&id=' + id + '&type=2', gotoPageRespone1, 'GET', 'JSON');
+7	}
+8	 
+9	function gotoPageRespone1(result)
+10	{
+11	  document.getElementById("ECS_COMMENT1").innerHTML = result.content;
+12	}
+由此，前端显示以及添加已经做完。
+后台管理界面整理
+1./admin/templets/comment_list.htm 37行修改为
+1	<td><a href="../{if $comment.comment_type eq '0' || $comment.comment_type eq '2' }goods{else}article{/if}.php?id={$comment.id_value}" target="_blank">{$comment.title}</td>
+2./langusges/zh_cn/admin/comment_manage.php 36行修改为
+1	$_LANG['type'] = array('商品','文章','咨询');
+3./admin/comment_manage.php 函数get_comment_list第359行sql三目逻辑改为
+1	$sql = ($row['comment_type'] == 0 || $row['comment_type'] == 2) ?
+2	           "SELECT goods_name FROM " .$GLOBALS['ecs']->table('goods'). " WHERE goods_id='$row[id_value]'" :
+3	           "SELECT title FROM ".$GLOBALS['ecs']->table('article'). " WHERE article_id='$row[id_value]'";
+4	       $row['title'] = $GLOBALS['db']->getOne($sql);
+以上操作已经基本做出了咨询的功能，具体细节还需要按需增删，比如咨询不需要评级等等

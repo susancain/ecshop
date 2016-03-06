@@ -1,0 +1,14 @@
+判断ecshop未付款添加去付款按钮,打开ecshop模板目录下user_transaction.dwt找到{$item.handler}
+ 
+这个变量 给它下面添加以下代码
+ 
+{if $item.pay_status eq 0}<a href="user.php?act=order_detail&order_id={$item.order_id}">去付款</a>{/if}
+ 
+在打开lib_transaction.php找到以下代码
+ 
+'order_status'   => $row['order_status'],
+ 
+给这段代码下面添加以下代码
+ 
+ 
+'pay_status'   => $row['pay_status'],

@@ -1,0 +1,8 @@
+ecshop修改配送方式：选择顺丰快递的时候，商品不满199元，则增加20元邮费(基础邮费10+20=30)。
+
+修改/includes/modules/shipping/sf_express.php第142行下增加
+
+
+1	if($goods_amount < 199){//商品总费用低于199则，邮费基础上累加20元邮费 by:gbytl@sina.cn 2013年3月20日 11:33:07
+2	 $fee += 20;
+3	 }

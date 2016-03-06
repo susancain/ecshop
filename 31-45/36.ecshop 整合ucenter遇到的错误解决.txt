@@ -1,0 +1,23 @@
+在ecshop 2.7.3整合ucenter之后ec用户能同步登陆到dz但是 uc_server始终显示通信失败，并且 dz登陆 退出状态不能同步到ec。
+观察发现ec的页面上有以下报错
+1	Strict Standards: Declaration of ucenter::login() should be compatible with integrate::login($username, $password, $remember = NULL) in D:\xampp\htdocs\ecshop\includes\modules\integrates\ucenter.php on line 52
+2	 
+3	Strict Standards: Declaration of ucenter::add_user() should be compatible with integrate::add_user($username, $password, $email, $gender = -1, $bday = 0, $reg_date= 0, $md5password = '') in D:\xampp\htdocs\ecshop\includes\modules\integrates\ucenter.php on line 52
+4	 
+5	Strict Standards: Declaration of ucenter::set_cookie() should be compatible with integrate::set_cookie($username = '', $remember = NULL) in D:\xampp\htdocs\ecshop\includes\modules\integrates\ucenter.php on line 52
+原来是ecshop中 /includes/modules/initgrates/ucenter.php中继承 /includes/modules/initgrates/initgrate.php重写方法时候参数不统一，只需同步这几个函数的参数定义方式即可
+如果ucenter退出，而其他同步的应用没有退出可以看看如下的方案
+在ecshop的/includes/lib_common.php   function uc_call
+这里的 $res = call_user_func_array( $func, $params ); 出错了
+替换成这样 ，就可以了
+if( !is_array($params)){
+$res = call_user_func( $func, $params );
+}else{
+$res = call_user_func_array( $func, $params );
+}
+或者直接把$params转换成数组
+则在 $res = call_user_func_array($func,$params);前面加上
+if(!$params) {
+$params = array();
+}
+即可

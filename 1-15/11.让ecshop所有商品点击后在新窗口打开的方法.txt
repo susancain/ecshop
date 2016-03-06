@@ -1,0 +1,28 @@
+ecshop的所有商品链接，点击是直接跳转到下一页，如果让商品点击是新窗口标签打开，这样客户能返回到列表页，对于客户体验来说，显得很不方便
+这个主要是修改ecshop模板文件，下面ecshop教程以官方默认模板为例，其他模板同理。
+1、首页今日特价
+打开 themes/default/library/recommend_promotion.lbi 文件
+找到 <a href="{$goods.url}"><img src="{$goods.thumb}" border="0" alt="{$goods.name|escape:html}"/></a><br />
+修改为
+<a href="{$goods.url}" target="_blank" /><img src="{$goods.thumb}" border="0" alt="{$goods.name|escape:html}"/></a><br />
+找到
+<p><a href="{$goods.url}" title="{$goods.name|escape:html}">{$goods.short_name|escape:html}</a></p>
+修改为
+<p><a href="{$goods.url}" title="{$goods.name|escape:html}" target="_blank" />{$goods.short_name|escape:html}</a></p>
+2、首页精品推荐、新品上市、热卖商品
+打开 themes/default/library/ 目录下的 recommend_best.lbi ，recommend_new.lbi 和 recommend_hot.lbi 三个文件，
+对每个文件都执行下面操作
+找到 <a href="{$goods.url}"><img src="{$goods.thumb}" alt="{$goods.name|escape:html}" class="goodsimg" /></a><br />
+修改为
+<a href="{$goods.url}" target="_blank" /><img src="{$goods.thumb}" alt="{$goods.name|escape:html}" class="goodsimg" /></a><br />
+继续找到
+<p><a href="{$goods.url}" title="{$goods.name|escape:html}">{$goods.short_style_name}</a></p>
+将它修改为
+<p><a href="{$goods.url}" title="{$goods.name|escape:html}" target="_blank" />{$goods.short_style_name}</a></p>
+3、商品列表
+打开 themes/default/library/goods_list.lbi 文件
+搜索
+href="{$goods.url}"
+一共能搜索到好几处，将每一个 href="{$goods.url}" 都修改为
+href="{$goods.url}" target="_blank" 
+注意： target="_blank" 后面有一个空格

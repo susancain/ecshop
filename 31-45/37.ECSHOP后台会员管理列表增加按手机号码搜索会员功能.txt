@@ -1,0 +1,31 @@
+ecshop会员列表中，如何在会员列表中增加手机号搜索呢，下面由ecshop模板网技术给大家介绍下方法：
+ 
+1、首先修改程序文件  admin/users.php  找到
+$filter['pay_points_lt'] = empty($_REQUEST['pay_points_lt']) ? 0 : intval($_REQUEST['pay_points_lt']);
+ 在它下面增加一行代码
+$filter['mobile_phone'] = empty($_REQUEST['mobile_phone']) ? 0 : trim($_REQUEST['mobile_phone']);
+
+继续找到
+ if ($filter['pay_points_lt'])
+        {
+            $ex_where .=" AND pay_points < '$filter[pay_points_lt]' ";
+        }
+ 
+在它下面增加下列代码
+if ($filter['mobile_phone'])
+        {
+            $ex_where .=" AND mobile_phone like '%$filter[mobile_phone]%' ";
+        }
+
+2、修改模板文件 admin/templates/users_list.htm  找到
+
+&nbsp;{$lang.label_user_name} &nbsp;<input type="text" name="keyword" />
+在它后面增加代码
+&nbsp;手机号码：&nbsp;<input type="text" name="mobile_phone" />
+ 
+继续找到
+listTable.filter['keywords'] = Utils.trim(document.forms['searchForm'].elements['keyword'].value);
+在它下面增加一行代码
+listTable.filter['mobile_phone'] = Utils.trim(document.forms['searchForm'].elements['mobile_phone'].value);
+ 
+温馨提示：修改php文件不要用记事本打开，最好用dw软件，否则网站会报错的。

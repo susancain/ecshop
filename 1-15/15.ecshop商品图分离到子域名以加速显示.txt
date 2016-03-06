@@ -1,0 +1,20 @@
+在使用ecshop做商店时，大量的图片是避免不了的。为了解决同域下浏览器下载的线程的限制，我们有必要把ecshop里上传的图片分离到另一个域名下。当前我采用产品ID的最后一个小数除以2取整来划分不同的子域来，这样在页面被浏览时加载图片可以更多同步线程下载到浏览器端以加速显示。
+ 
+下面是ecshop模板网修改ecshop的方法：
+ 
+在/includes/lib_common.php中大约2774行，找到下面代码，增加红色部位即可。
+ 
+function get_image_path($goods_id, $image='', $thumb=false, $call='goods', $del=false){
+    $url = empty($image) ? $GLOBALS['_CFG']['no_picture'] : $image;
+    $url = str_replace('images/','http://pic'.floor(substr($goods_id,-1)/2).'.ecshoptemplate.com/',$url); // 增加的
+    return $url;
+}
+ 
+当然，如果你觉得这样操作比较麻烦，也可以这样。商品图统一用某特定URL做CDN加速。
+ 
+ 
+function get_image_path($goods_id, $image='', $thumb=false, $call='goods', $del=false)
+{
+    $url = empty($image) ? $GLOBALS['_CFG']['no_picture'] : $image;
+    return "http://www.ecshoptemplate.com/".$url;
+}

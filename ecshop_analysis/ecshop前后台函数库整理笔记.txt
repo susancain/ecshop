@@ -1,0 +1,117 @@
+ecshop前后台函数库整理笔记
+接触ecshop差不多半年了，大致的东西基本上也都掌握，为了提高效率，整理了一下ecshop的一些函数库，包括前台还有后台的。
+
+熟悉这些函数，可以减少不少麻烦，熟悉之后，你遍知道系统有哪些已经写好的功能，很多时候就可以直接拿来用，而不用因为不知道，去手写代码，这样就很不划算了。
+
+lib_main.php	ECSHOP 前台公用函数库
+
+update_user_info    更新用户SESSION,COOKIE及登录时间、登录次数。
+get_user_info	    获取用户信息数组
+assign_ur_here    取得当前位置和页面标题
+get_parent_cats    获得指定分类的所有上级分类
+build_pagetitle	根据提供的数组编译成页面标题
+build_urhere	根据提供的数组编译成当前位置
+assign_dynamic    获得指定页面的动态内容
+assign_articles	分配文章列表给smarty
+get_shop_help	分配帮助信息
+assign_pager	创建分页信息
+get_pager    生成给pager.lbi赋值的数组
+get_vote	调用调查内容
+get_user_browser	获得浏览器名称和版本
+is_spider	判断是否为搜索引擎蜘蛛
+get_os		获得客户端的操作系统
+visit_stats	统计访问信息
+save_searchengine_keyword	保存搜索引擎关键字
+get_tags	获得指定用户、商品的所有标记
+get_dyna_libs	获取指定主题某个模板的主题的动态模块
+dyna_libs_replace	替换动态模块
+upload_file    处理上传文件，并返回上传图片名(上传失败时返回图片名为空）
+show_message	显示一个提示信息
+parse_rate_value	将一个形如+10, 10, -10, 10%的字串转换为相应数字，并返回操作符号
+recalculate_price    重新计算购物车中的商品价格：目的是当用户登录时享受会员价格，当用户退出登录时不享受会员价格
+assign_comment	查询评论内容
+assign_template	将一些常用的参数调到前台使用
+time2gmt		将一个本地时间戳转成GMT时间戳
+get_user_bonus	查询会员的红包金额
+set_affiliate	保存推荐uid
+get_affiliate	获取推荐uid
+article_categories_tree    获得指定分类同级的所有分类以及该分类下的子分类
+get_article_parent_cats    获得指定文章分类的所有上级分类
+get_library_number	取得某模板某库设置的数量
+get_navigator	取得自定义导航栏列表
+license_info	授权信息内容
+url_domain	获取域名
+
+lib_common.php	ECSHOP 公用函数库
+
+db_create_in    创建像这样的查询: "IN('a','b')";
+is_email	验证输入的邮件地址是否合法
+is_time    检查是否为一个合法的时间格式
+assign_query_info	获得查询时间和次数，并赋值给smarty
+region_result	创建地区的返回信息
+get_regions	获得指定国家的所有省份
+get_shipping_config	获得配送区域中指定的配送方式的配送费用的计算参数
+&init_users	初始化会员数据整合类
+cat_list	获得指定分类下的子分类的数组
+cat_options	过滤和排序所有分类，返回一个带有缩进级别的数组
+load_config	载入配置信息
+get_brand_list	取得品牌列表
+get_brands    获得某个分类下
+get_promotion_info	所有的促销活动信息
+get_children	获得指定分类下所有底层分类的ID
+get_article_children    获得指定文章分类下所有底层分类的ID
+get_mail_template	获取邮件模板
+order_action	记录订单操作记录
+price_format    格式化商品价格
+get_virtual_goods	返回订单中的虚拟商品
+virtual_goods_ship	虚拟商品发货
+virtual_card_shipping	虚拟卡发货
+virtual_card_result	返回虚拟卡信息
+get_snatch_result	获取指定 id snatch 活动的结果
+clear_tpl_files    	清除指定后缀的模板缓存或编译文件
+clear_compiled_files	清除模版编译文件
+clear_cache_files	清除缓存文件
+clear_all_files	    清除模版编译和缓存文件
+smarty_insert_scripts	页面上调用的js文件
+smarty_create_pages	创建分页的列表
+build_uri		重写 URL 地址
+formated_weight	    格式化重量：小于1千克用克表示，否则用千克表示
+log_account_change	记录帐户变动
+article_cat_list	获得指定分类下的子分类的数组
+article_cat_options	过滤和排序所有文章分类，返回一个带有缩进级别的数组
+uc_call		调用UCenter的函数
+exception_handler	error_handle回调函数
+get_image_path  重新获得商品图片与商品相册的地址
+user_uc_call	调用使用UCenter插件时的函数
+get_volume_price_list	取得商品优惠价格列表
+get_final_price    取得商品最终使用价格
+sort_goods_attr_id_array	将 goods_attr_id 的序列按照 attr_id 重新排序
+is_spec		是否存在规格
+get_package_info	获取指定id package 的信息
+get_package_goods	获得指定礼包的商品
+get_good_products	取商品的货品列表
+get_good_products_select	取商品的下拉框Select列表
+get_specifications_list	取商品的规格列表
+
+lib_main.php	ECSHOP 后台管理中心公用函数
+
+read_modules	获得所有模块的名称以及链接地址
+sys_msg		系统提示信息
+admin_log       记录管理员的操作内容
+sys_joindate    将通过表单提交过来的年月日变量合成为"2004-05-10"的格式。
+set_admin_session	设置管理员的session内容
+insert_config    插入一个配置信息
+admin_priv	判断管理员对某一个操作是否有权限
+check_authz	检查管理员权限
+check_authz_json	检查管理员权限，返回JSON格式数据
+get_bonus_type	取得红包类型数组（用于生成下拉列表）
+get_rank_list	取得用户等级数组,按用户级别排序
+get_user_rank    按等级取得用户列表（用于生成下拉列表）
+get_position_list	取得广告位置数组（用于生成下拉列表）
+create_html_editor    生成编辑器
+get_goods_list    取得商品列表：用于把商品添加到组合、关联类、赠品类
+get_article_list    取得文章列表：用于商品关联文章
+get_yes_no	返回是否（图标no.gif/yes.gif）
+get_where_sql	生成过滤条件：用于 get_goodslist 和 get_goods_list
+
+函数很多，记住那大概三分之一常用的就好了，相信会给你带来很多方便！

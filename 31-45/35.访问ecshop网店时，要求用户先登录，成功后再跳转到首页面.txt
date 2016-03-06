@@ -1,0 +1,16 @@
+因客户须求，访问网站时，要求用户先登录，成功后再跳转到首页面。我们ecshop模板网技术将解决的方法整理如下：
+ 
+访问网站时，要求用户先登录，成功后再跳转到首页面。当用户访问网站时，首先必须登录，登录后进入网站，如果没有账号，先注册。
+ 
+1、我们打开index.php文件
+找到 require(dirname(__FILE__) . '/includes/init.php'); 的下面加上一条判断，
+if($_SESSION['user_id']<1){Header("Location: user.php");}
+ 
+首页就可以实现如果没登录先登录，否则注册。
+ 
+2、然后打开user.php，修改第300行
+ show_message($_LANG['login_success'] . $ucdata , array($_LANG['back_up_page'], $_LANG['profile_lnk']), array($back_act,'user.php'), 'info');
+ 
+修改为
+ 
+ show_message($_LANG['login_success'] . $ucdata , array('返回网站首页', $_LANG['profile_lnk']), array('index.php','user.php'), 'info');

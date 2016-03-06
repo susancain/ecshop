@@ -1,0 +1,503 @@
+﻿Ecmall文件目录结构汇总
+一、目录结构
+[1]<1>admin    ---后台管理文件
+  app    ---后台管理所需类文件
+acategory.app.php   ---文章分类类文件
+admin.app.php       ---管理员控制类文件
+article.app.php     ---文章管理类文件
+backend.base.php    ---用户操作类文件
+brand.app.php       ---商品品牌管理类文件
+captcha.app.php     ---验证码类文件
+comupload.app.php   ---普通文件上传类文件
+consulting.app.php  ---资讯管理类文件
+db.app.php          ---数据库控制类文件
+default.app.php     ---默认控制类文件
+gcategory.app.php   ---商品分类管理类文件
+goods.app.php       ---商品管理类文件
+groupbuy.app.php    ---团购管理类文件
+mailtemplate.app.php –通知模版管理类文件
+module.app.php      ---模块控制类文件
+navigation.app.php  ---页面导航管理类文件
+notice.app.php      ---网站通知（会员）类文件
+order.app.php       ---订单管理类文件
+partner.app.php     ---合作伙伴控制类文件
+payment.app.php     ---支付方式管理类文件
+plugin.app.php      ---插件管理类文件
+recommend.app.php   ---推荐管理类文件
+region.app.php      ---地区管理类文件
+scategory.app.php   ---店铺分类管理类文件
+setting.app.php     ---网站基本设置管理类文件
+sgrade.app.php      ---店铺等级管理类文件
+share.app.php       ---商品分享管理类文件
+store.app.php       ---店铺管理类文件
+swfupload.app.php   ---批量上传控制类文件
+template.app.php    ---挂件基础控制类文件
+theme.app.php       ---主题设置管理类文件
+user.app.php        ---会员管理类文件
+widget.app.php      ---挂件管理类文件
+ <2> includes   ---后台管理库文件
+javascript
+  template_panel.js   ---后台模版编辑文件
+menu.inc.php   ---后台管理导航文件
+priv.inc.php   ---后台管理左侧菜单数据文件
+  <3>templates   ---后台管理模版文件
+js          ---后台管理js文件
+  admin.js        ---后台管理操作
+  index.js        ---页面js
+  navigation.js      ---页面导航js
+style        ---后台样式文件
+  image         ---后台图片
+  admin.css      ---后台管理页面样式
+  jqtreetable.css      ---后台树形菜单样式
+  login.css       ---后台登录样式文件
+template_panle.css       ---模版样式
+aboutus.html           ---后台关于我们页面
+acategory.form.html    ---文章分类form表单页面
+acategory.index.html   ---文章分类显示页面
+admin.form.html       ---管理员(权限）form表单页面
+admin.index.html       ---管理员显示页面
+admin.test.html        ---管理员添加页面
+article.form.html      ---文章管理form表单页面
+article.index.html     ---文章显示页面
+brand.form.html        ---品牌管理form表单页面
+brand.index.html       ---品牌显示页面
+brand_refuse.html      ---抵制品牌
+common.export.html     ---导出功能页面
+common.import.html     ---导入功能页面
+cycleimg.form.html     ---轮播图片form表单页面
+cycleimg.index.html    ---轮播图片显示页面
+db.backup.html         ---数据库备份页面
+db.message.html        ---数据库备份提示页面
+db.restore.html        ---数据库恢复页面
+footer.html            ---后台页脚
+gcategory.batch.html   ---商品分类批量编辑页面
+gcategory.form.html    ---商品分类form表单页面
+gcategory.index.html   ---商品分类显示页面
+goods.batch.html       ---商品推荐批量操作页面
+goods.index.html       ---商品显示页面
+goodsqa.index.html     ---资讯管理显示页面
+groupbuy.form.html     ---团购管理form表单页面
+groupbuy.index.html    ---团购管理显示页面
+header.html            ---后台头文件
+image.html             ---普通文件上传页面
+index.html             ---后台首页
+login.html             ---后台登录页面
+message.html           ---后台系统消息页面
+module.form.html       ---模块安装form表单页面
+navigation.form.html   ---页面导航form表单页面
+navigation.index.html  ---页面导航显示页面
+notice.form.html       ---会员通知form表单页面
+notice.message.html    ---会员通知提示页面
+noticetemplate.index.html ---通知模版显示页面
+noticetemplate.mail.html  ---邮件通知模版页面
+noticetemplate.msg.html   ---短信通知模版页面
+order.index.html       ---订单管理显示页面
+order.view.html        ---订单信息查看页面
+page.bottom.html       ---上分页
+page.top.html          ---下分页
+partner.form.html      ---合作伙伴form表单页面
+partner.index.html     ---合作伙伴显示页面
+payment.index.html     ---支付方式管理页面
+plugin.form.html       ---启用插件form表单页面
+plugin.index.html      ---插件显示页面
+recommend.form.html    ---推荐类型form表单页面
+recommend.goods.html   ---推荐商品页面
+recommend.index.html   ---推荐类型显示页面
+region.form.html       ---地区设置form表单页面
+region.index.html      ---地区显示页面
+scategory.form.html    ---店铺分类form表单页面
+scategory.index.html   ---店铺分类显示页面
+setting.base_information.html  ---基本信息设置页面
+setting.base_setting.html   ---系统设置页面
+setting.captcha_setting.html  ---验证码设置页面
+setting.credit_setting.html  ---信用评价设置页面
+setting.email_setting.html   ---email设置页面
+setting.store_setting.html   ---开店设置页面
+setting.subdomain_setting.html ---二级域名设置页面
+sgrade.form.html         ---店铺等级form表单页面
+sgrade.skins.html        ---店铺等级皮肤设置页面
+sgrade.index.html        ---店铺等级显示页面
+share.form.html          ---分享链接form表单页面
+share.index.html         ---分享链接显示页面
+store.batch.html         ---店铺管理批量编辑页面
+store.form.html          ---店铺增加form表单页面
+store.index.html         ---店铺管理显示页面
+store.test.html          ---店铺添加页面
+store.view.html          ---店铺编辑表单页面
+template.index.html      ---模版编辑显示页面
+template.panel.html      ---模版挂件列表显示页面
+theme.index.html         ---主题设置显示页面
+user.form.html           ---会员管理form表单页面
+user.index.html          ---会员显示页面
+welcome.html             ---欢迎页面
+widget.form.html         ---挂件管理form表单页面
+widget.index.html        ---挂件管理显示页面
+  index.php   ---后台管理入口文件
+[2]api    ---应用程序接口文件
+  api.base.php    ---api控制器基类文件
+  uc.app.php      ---ucenter接口文件
+  uc.php          ---ucenter接口文件
+[3]app      ---前台控制器基类文件
+  apply.app.php            ---申请开店类文件
+  article.app.php          ---文章管理类文件
+  brand.app.php            ---品牌管理类文件
+  buyer_groupbuy.app.php   ---买家我的团购类文件
+  buyer_order.app.php      ---买家订单类文件
+  captcha.app.php          ---验证码管理类文件
+  cart.app.php             ---购物车控制类文件
+  cashier.app.php          ---收银台控制类文件
+  category.app.php         ---分类控制类文件
+  comupload.app.php        ---普通文件上传类文件
+  coupon.app.php            ---优惠券管理类文件
+  default.app.php           ---默认控制类文件
+  find_password.app.php     ---找回密码控制类文件
+  friend.app.php            ---好友控制类文件
+  frontend.base.php         ---前台基础控制类文件
+  goods.app.php             ---商品控制类文件
+  groupbuy.app.php          ---团购控制类文件
+  gselector.app.php         ---搜索选择商品控制类文件
+  member.app.php            ---会员中心控制类文件
+  message.app.php           ---信息管理类文件
+  mlselection.app.php       ---多级选择控制类文件
+  my_address.app.php        ---我的收货地址控制类文件
+  my_category.app.php       ---店铺商品分类控制类文件
+  my_coupon.app.php         ---我的优惠券控制类文件
+  my_favorite.app.php       ---我的收藏控制类文件
+  my_goods.app.php          ---用户中心商品管理类文件
+  my_navigation.app.php     ---会员中心导航管理类文件
+  my_partner.app.php        ---合作伙伴控制类文件
+  my_payment.app.php        ---支付方式管理类文件
+  my_qa.app.php             ---商品资讯管理类文件
+  my_question.app.php       ---买家资讯管理类文件
+  my_shipping.app.php       ---配送方式管理类文件
+  my_store.app.php          ---店铺设置类文件
+  my_theme.app.php          ---主题设置类文件
+  order.app.php             ---售货员控制类文件
+  paynotify.app.php         ---支付网关通知接口类文件
+  search.app.php            ---搜索查询类文件
+  seller_groupbuy.app.php   ---团购管理类文件
+  seller_order.app.php      ---我的订单管理类文件
+  sendmail.app.php          ---发送邮件类文件
+  sitemap.app.php           ---网站地图更新控制类文件
+  store.app.php             ---我的店铺查看类文件
+  swfupload.app.php         ---批量上传控制类文件
+[4]data             ---数据资料中心文件
+  files          ---数据文件
+mall         ---商城数据
+portrait     ---头像数据
+  mailtemplate  
+  page_config      ---模版页的数据文件
+    default.index.config.php    ---默认模版数据文件
+system               ---网站首页默认图片
+sql_backup           ---sql备份存放
+config.inc.php       ---程序配置常量信息文件
+payment.inc.php      ---支付配置文件
+system.info.php      ---系统信息文件
+tasks.inc.php        ---
+[5]eccore
+  controller           ---系统控件类文件
+app.base.php       ---控制器基础类
+message.base.php   ---消息控制类文件
+  model                ---数据库操作与模型实现类
+model.base.php     ---模型基础文件
+mysql.php          --- MYSQL 公用类库文件
+  view                 ---模版解析类
+    template.php       ---模版类文件
+  ecmall.php           ---框架核心文件
+[6]external               
+  modules                        ---模块文件
+datacall                     ---数据调用
+  languages                  ---语言包
+    sc-utf-8
+      common.lang.php        ---通用语言文件
+  templates 
+    admin 
+      datacall.form.html  ---数据调用form表单文件
+      datacall.index.html  ---数据调用显示页面
+      footer.html 
+      header.html
+  admin.module.php        ---后台数据调用模型类
+  index.module.php        ---前台数据调用模型类
+  install.php             ---新建模块安装文件
+  module.info.php         ---模块信息文件
+  uninstall.php           ---模块卸载文件
+  plugins                     ---插件目录
+open_email                ---邮件通知插件
+  main.plugin.php         ---邮件通知主体代码文件
+  plugin.info.php        ---邮件通知描述信息文件
+short_store_url          ---店铺地址简写插件
+  main.plugin.php        ---主体代码文件
+  plugin.info.php        ---描述信息文件
+  widgets                      ---挂件目录
+advt                     ---广告挂件
+best_goods               ---精品推荐挂件
+brand                    ---品牌挂件
+Catalog                  ---商品分类挂件
+Cycle_image              ---轮播图片挂件
+four_image_ads           --- 4个图片广告挂件
+gcategory_list           ---商品分类挂件
+goods_module_1           ---商品模块挂件1
+goods_module_2           ---商品模块挂件2
+image_ad                 ---图片广告挂件
+latest_sold              ---最新成交挂件
+notice                   ---公告栏挂件
+partner                  ---合作伙伴挂件
+recommended_groupbuy     ---推荐团购挂件
+recommended_store        ---推荐店铺挂件
+register_and_apply       ---注册和加盟按钮挂件
+sale_price               ---特价商品挂件
+sale_list                ---销售排行前十挂件
+[7]includes
+  arrayfiles
+  captcha
+  codetable
+  goodstypes
+  libraries
+  models
+  ordertypes
+  passports
+  payments
+  rewrite_engines
+  tasks
+  arrayfile.base.php       ---数组文件基类
+  ecapp.base.php           ---应用基础类与访问者基础类
+  global.lib.php           ---通用对象类文件
+  goods.base.php         ---商品类型基类
+  module.base.php        ---模块后台控制器基础类
+  order.base.php         ---订单类型基类
+  passport.base.php      ---用户中心连接接口基础类
+  payment.base.php       ---支付方式基础类
+  plugin.base.php        ---插件基础类
+  rewrite.base.php       ---基础Rewrite重写引擎类
+  subdomain.inc.php      ---二级域名解析类
+  widget.base.php        ---挂件基础类
+install
+[8]languages                ---语言包
+  sc-utf-8               ---utf-8编码
+admin                ---后台管理模版文字
+payment              ---支付方式模版文字
+---前台模版文字
+apply.lang.php             ---申请开店
+article.lang.php           ---文章管理
+brand.lang.php             ---品牌管理
+buyer_groupbuy.lang.php    ---买家我的团购
+buyer.order.lang.php       ---买家订单
+captcha.lang.php           ---验证码
+cart.lang.php              ---购物车
+cashier.lang.php           ---收银台
+category.lang.php          ---分类控制
+common.lang.php            ---通用
+comupload.lang.php         ---普通文件上传
+coupon.lang.php            ---优惠券管理
+default.lang.php           ---默认控制
+find_password.lang.php     ---找回密码
+friend.lang.php            ---好友
+goods.lang.php             ---商品
+groupbuy.lang.php          ---团购
+gselector.lang.php         ---搜索
+jslang.lang.php            ---js
+member.lang.php            ---会员中心
+message.lang.php           ---信息管理
+mlselection.lang.php       ---多级选择
+my_address.lang.php        ---我的收货地址
+my_category.lang.php       ---店铺商品分类
+my_coupon.lang.php         ---我的优惠券
+my_favorite.lang.php       ---我的收藏
+my_goods.lang.php          ---用户中心商品
+my_navigation.lang.php     ---会员中心导航
+my_partner.lang.php        ---合作伙伴
+my_payment.lang.php        ---支付方式
+my_qa.lang.php             ---商品资讯
+my_shipping.lang.php       ---配送方式
+my_store.lang.php          ---店铺设置
+my_theme.lang.php          ---主题设置
+order.lang.php             ---售货员控制
+paynotify.lang.php         ---支付网关通知
+search.lang.php            ---搜索查询
+seller_order.lang.php      ---我的订单
+seller_groupbuy.lang.php   ---团购管理
+sendmail.lang.php          ---发送邮件
+sitemap.lang.php           ---网站地图
+store.lang.php             ---我的店铺
+swfupload.lang.php         ---批量上传
+[9]temp                           ---模版缓存
+[10]thmems
+  mall                      ---商城模版文件
+default                 ---默认模版
+  styles
+    default
+      css
+      image
+      js
+  apply.index.html         ---申请开店页面
+  apply.step1.html         ---申请开店步骤1
+  apply.step2.html         ---申请开店步骤2
+  article.index.html       ---文章列表显示页面
+  article.view.html        ---文章查看页面
+  brand.index.html         ---品牌默认显示页面
+  brand_apply.html         ---品牌申请页面
+  brand_list.html          ---品牌列表页面
+  buyer_groupbuy.index.html  ---团购列表页面
+  buyer_order.cancel.html  ---订单取消页面
+  buyer_order.confirm.html  ---订单确认页面
+  buyer_order.evaluate.html  ---订单评价页面
+  buyer_order.index.html    ---订单显示页面
+  buyer_order.view.html     ---订单查看页面
+  cart.empty.html           ---空购物车显示页面
+  cart.index.html           ---购物车显示页面
+  cashier.payform.html      ---收银台信息页面
+  cashier.payment.html      ---收银台支付页面
+  category.goods.html       ---商品分类页面
+  category.store.html       ---店铺分类页面
+  common.export.html        ---导出功能页面
+common.import.html        ---导入功能页面
+  coupon.form.html          ---优惠券form表单页面
+  coupon.index.html         ---优惠券显示页面
+  coupon_export.html        ---优惠券导出页面
+  coupon_extend.html        ---优惠券发放页面
+  curlocal.html             ---当前位置页面
+  export_ubbcode.html       ---UBB导出页面
+  find_password.html        ---找回密码页面
+  footer.html
+  friend.form.html          ---好友form表单页面
+  friend.index.html         ---好友列表页面
+  gselector.store.html      ---搜索页面
+  header.html
+  image.html                ---普通上传页面
+  import.taobao.html        ---淘宝助理导入页面
+  index.html                ---首页
+  login.html                ---用户登录页面
+  member.email.html         ---个人邮箱修改页面
+  member.feed_settings.html  ---个人动态设置页面
+  member.header.html        ---个人头信息页面
+  member.index.html         ---个人页面
+  member.menu.html          ---个人菜单页面
+  member.page.bottom.html   ---个人上分页
+  member.page.top.html      ---个人下分页
+  member.password.html      ---密码修改页面
+  member.profile.html       ---个人资料页面
+  member.register.html      ---会员注册页面
+  member.submenu.html       ---个人子菜单页面
+  message.box.html          ---短消息列表页面
+  message.html              ---短消息发送提示页面
+  message.send.html         ---短消息发送页面
+  message.view.html         ---短消息查看页面
+  my_address.form.html    ---我的地址form表单页面
+  my_address.index.html   ---我的地址显示页面
+  my_category.form.html   ---分类管理form表单页面
+  my_category.index.html  ---分类管理显示页面
+  my_coupon.form.html   ---我的优惠券form表单页面
+  my_coupon.index.html   ---我的优惠券显示页面
+  my_favorite.goods.index.html ---我的收藏商品页面
+  my_favorite.store.index.html ---我的收藏店铺页面
+  my_goods.batch.html      ---商品批量导入页面
+  my_goods.form.html       ---商品form表单页面
+  my_goods.index.html      ---商品显示页面
+  my_navigation.form.html    ---导航管理form页面
+  my_navigation.index.html   ---导航管理显示页面
+  my_partner.form.html    ---合作伙伴form表单页面
+  my_partner.index.html   ---合作伙伴显示页面
+  my_payment.form.html    ---支付方式form表单页面
+  my_payment.index.html   ---支付方式显示页面
+  my_qa.form.html         ---资讯管理form表单页面
+  my_qa.index.html        ---资讯管理显示页面
+  my_question.index.html  ---我的资讯显示页面
+  my_shipping.form.html   ---配送方式form表单页面
+  my_shipping.index.html  ---配送方式显示页面
+  my_store.index.html     ---店铺设置页面
+  my_theme.index.html     ---主题设置页面
+  order.amount.html     ---订单总价页面
+  order.form.html       ---订单form页面
+  order.goods.html      ---订单商品页面
+  order.postscript.html  ---订单附言页面
+  order.shipping.html    ---订单配送页面
+  page.bottom.html     ---下分页
+  page.top2.html       ---上分页2
+  page.top.html        ---上分页
+  paynotify.index.html  ---支付网关通知页面
+  search.goods.html    ---商品搜索页面
+  search.groupbuy.html   ---团购搜索页面
+  search.store.html      ---店铺搜索页面
+  seller_groupbuy.cancel.html   ---团购取消页面
+  seller_groupbuy.desc.html    ---团购描述页面
+  seller_groupbuy.form.html   ---团购form表单页面
+  seller_groupbuy.index.html  ---团购列表页面
+  seller_groupbuy.log.html    ---团购订购详情页面
+  seller_order.adjust_fee.html ---订单调整费用页面
+  seller_order.cancel.html   ---订单取消页面
+  seller_order.confirm.html   ---订单确认页面
+  seller_order.finished.html   ---订单已完成页面
+  seller_order.index.html     ---订单列表页面
+  seller_order.received_pay.html ---订单已付款页面
+  seller_order.shipped.html    ---订单已发货页面
+  seller_order.view.html       ---订单信息查看页面
+  set_password.html       ---重置密码页面
+  spec_edit.html         ---编辑价格、库存页面
+  theme.info.php
+  store                              ---店铺模版文件
+default
+  styles
+    default
+    ……
+  comments.html          ---评论页面
+  footer.html
+  goods.comments.html    ---商品评价页面
+  goods.index.html       ---商品显示页面
+  goods.qa.html          ---商品资讯页面
+  goods.saleslog.html    ---商品销售信息页面
+  goodsinfo.html         ---商品信息页面
+  groupbuy.index.html    ---团购页面
+  header.html   
+  left.html
+  page.bottom.html
+  qa.html         ---资讯页面
+  saleslog.html     ---销售信息页面
+  store.article.html   ---店铺文章页面
+  store.credit.html     ---店铺信誉页面
+  store.groupbuy.html   ---店铺团购页面
+  store.index.html      ---店铺页面
+  store.search.html     ---店铺搜索页面
+  top.html
+[11]admin.php    ---后台入口文件
+[12]index.php    ---前台入口文件
+[13]htaccess.txt
+
+
+数据表介绍
+
+
+ECMALL数据库主要表
+ecm_acategory：存放的是商城的文章分类。
+ecm_address：存放的是店长的地址
+ecm_article：存放的是商城的相关文章
+ecm_brand：存放的是商城的品牌分类（注意与表ecm_scategory的区别）比如耐克，阿迪等等
+ecm_cart；存放的是购物车的商品
+ecm_gcategory：存放的是每个店的商品分类
+ecm_goods；存放的是每个店里的商品，里面有该商品的ID，属于哪个店（店的ID）
+ecm_goods_image：存放的是商城中所有商品的图片。
+ecm_goods_spec：存放的是商品的规格，比如颜色、尺码、库存、货号等，里面有该商品的id
+ecm_goods_statistics；存放的是每个商品的一些信息，比如被人浏览次数、被人收藏次数、顾客评论等等。
+ecm_groupbuy；存放的是团购的信息
+ecm_member；存放的是每个店长的信息资料
+ecm_module；存放的是模块的信息（模块管理）
+ecm_navigation：存放的是商城首页的导航信息
+ecm_order：存放的是商城的订单
+ecm_payment：存放的是各个店铺的付款方式信息
+ecm_region：存放的是地区（地区设置—国家、省份、市区、县）
+ecm_recommended_goods:存放的是被推荐的商品
+ecm_recommend:存放的是推荐类型
+ecm_scategory：存放的是商城的商品分类，比如鞋子，上衣，裤子等等。
+ecm_sessions：存放的是商城登录session信息，session过时时间好像是1440s
+ecm_sgrade；存放的是店铺等级信息。比如一年多少钱、允许发布的商品数等
+ecm_shipping：存放的是每个店铺的配送方式
+ecm_store：存放的是商城中所有店铺的信息
+ecm_uploaded_file：存放的是商城中所有文件的信息，包括图片
+还有一少部分表没写，主要是平常不怎么用或者就有2、3个字段。
+后面需要解决的问题，初略定为以下：
+系统请求跳转分析
+1.数据库关系模型的实现
+2.登录用户信息$this->visitor->get("user_id")的实现
+3.模板解析分析
+4.页面json对象传输实现
+5.缓存分析
+

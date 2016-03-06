@@ -1,0 +1,22 @@
+ecshop团购说明很简单。添加个图片都很不方便， 这次我把他改成商品详情那种FCKeditor编辑器
+
+1、打开  admin/group_buy.php 在 20 行左右添加
+include_once(ROOT_PATH . 'includes/fckeditor/fckeditor.php'); // 包含 html editor 类文件
+
+再继续在 admin/group_buy.php 查找
+if ($_REQUEST['act'] == 'add') { $group_buy = array( 'act_id' => 0, 'start_time' => date('Y-m-d', time() + 86400), 'end_time' => date('Y-m-d', time() + 4 * 86400), 'price_ladder' => array(array('amount' => 0, 'price' => 0)) );
+在这段代码下边添加如下代码（大概91行左右）
+create_html_editor('act_desc');
+
+再继续查找代码（大概101行左右）
+$group_buy = group_buy_info($group_buy_id);
+在下边添加代码
+create_html_editor('act_desc',$group_buy['act_desc']);
+
+
+2、打开 admin/templates/group_buy_info.htm  查找代码
+<textarea name="act_desc" cols="40" rows="3" >{$group_buy.act_desc}</textarea>
+替换成如下代码
+{$FCKeditor}
+
+再在就可以了，进入后台清除缓存，看看。

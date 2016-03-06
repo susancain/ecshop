@@ -1,0 +1,12 @@
+ecshop注册的用户名是乱码，问题出在ECSHOP在把资料放进数据库时, 经过了htmlentities的处理, 防止javascriptr的恶意输入,
+文件位于/includes/lib_passport.php第165行：
+原代码: $other[$key] = htmlentities($val); //防止用户输入javascript代码
+ 
+只要把htmlentities换成htmlspecialchars就OK 了
+ 
+$other[$key] = htmlspecialchars($val); //防止用户输入javascript代码
+另一个文件位于/includes/lib_transaction.php第85行：
+原代码： $profile['other'][$key] = htmlentities($val); //防止用户输入javascript代码
+修改后的代码为：
+$profile['other'][$key] = htmlspecialchars($val); //防止用户输入javascript代码
+改类情况同样适合于ECSHOP二次开发，需要在数据库中加入一些字段,可能在存储过程中会遇到乱码问题

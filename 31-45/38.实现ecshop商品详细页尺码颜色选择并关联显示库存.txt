@@ -1,0 +1,57 @@
+ecshop服装商城很多都十分需要一个颜色尺码的功能，其实在淘宝，凡客上都类似的功能，客户在下单时容易选择相应的颜色尺码，其实ecshop要实现这样的功能并不难，因为ecshop是开源免费的。
+ 
+goods.dwt修改如何下：
+ 
+<!-- {foreach from=$spec.values item=value key=key} -->
+ 
+<a {if $key eq 0}class="cattsel"{/if} onclick="changeAtt(this,{$value.id},{$goods.goods_id})" href="javascript:;" name="{$value.id}" title="[{if $value.price gt 0}{$lang.plus}{elseif $value.price lt 0}{$lang.minus}{/if} {$value.format_price|abs}]">{$value.label}<input style="display:none" id="spec_value_{$value.id}" type="radio" name="spec_{$spec_key}" value="{$value.id}" {if $key eq 0}checked{/if} /></a>
+ 
+<!-- {/foreach} -->
+ 
+在显示详细信息合适的地方加
+<font style=" color:#CCCCCC;">（库存：<font id="shows_number">{$goods.goods_number} {$goods.measure_unit}</font>）</font>
+ 
+在goods.dwt加js代码:
+function changeAtt(t,a,goods_id) {
+t.lastChild.checked='checked';
+for (var i = 0; i<t.parentNode.childNodes.length;i++) {
+if (t.parentNode.childNodes[i].className == 'cattsel') {
+t.parentNode.childNodes[i].className = '';
+}
+}
+ 
+t.className = "cattsel";
+var formBuy = document.forms['ECS_FORMBUY'];
+spec_arr = getSelectedAttributes(formBuy);
+Ajax.call('goods.php?act=get_products_info', 'id=' + spec_arr+ '&goods_id=' + goods_id, shows_number, 'GET', 'JSON');
+changePrice();
+}
+function shows_number(result)
+{
+if(result.product_number !=undefined)
+{
+$('shows_number').innerHTML = result.product_number+'件';
+}
+else
+{
+$('shows_number').innerHTML = '未设置'
+}
+}
+ 
+打开goods.php添加70行左右吧
+if (!empty($_REQUEST['act']) && $_REQUEST['act'] == 'get_products_info')
+{
+include('includes/cls_json.php');
+ 
+$json = new JSON;
+// $res = array('err_msg' => '', 'result' => '', 'qty' => 1);
+ 
+$spce_id = $_GET['id'];
+$goods_id = $_GET['goods_id'];
+$row = get_products_info($goods_id,explode(",",$spce_id));
+//$res = array('err_msg'=>$goods_id,'id'=>$spce_id);
+die($json->encode($row));
+ 
+}
+ 
+通过以上操作便可实现仿淘宝颜色尺码选择功能

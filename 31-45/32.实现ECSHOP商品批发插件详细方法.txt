@@ -1,0 +1,82 @@
+ECSHOP 商品批发插件免费共享给大家！因用户须要，所以特整理分享出来，ecshop模板网原创整理，转载请注明来源！代码如下：
+1、打开goods.dwt加入
+<form action="flow.php" method="post" name="ECS_ALL_addcart" >< table width="100%" border="0" cellpadding="0" cellspacing="2" bgcolor="#FFFFFF">
+<tr bgcolor="#5e554e" style="color:#FFFFFF;">
+<td align="center" width="150">货号</td>
+<td align="center" width="150">规格</td>
+<td align="center" width="80">销售价</td>
+<td align="center" width="140">会员价</td>
+<td align="center">订购数量</td>
+<td align="center">库存</td>
+</tr>
+<!-- {foreach from=$product_list item=product} -->
+<tr bgcolor="#f7f7f7">
+<td align="center" >{$product.product_sn}<input
+name="product_sn[{$product.product_id}]" id="number" value="{$product.product_sn}" type="hidden" /></td>
+<td align="center" >
+<!--{foreach from=$product.goods_attr_id item=goods_attr_id }-->< input
+name="goods_attr[{$product.product_id}][]" type="hidden" value="{$goods_attr_id}" />< !-- {/foreach}-->
+<!--{foreach from=$product.goods_attr item=goods_attr name=pro }--> {$goods_attr}< !--{if $smarty.foreach.pro.iteration ne $smarty.foreach.pro.total}--> |< !--{/if}-->< !-- {/foreach}--></td>
+<td align="center" >{$goods.shop_price_formated}</td>
+<td align="center" >< !-- 会员等级对应的价格{foreach from=$rank_prices item=rank_price key=key} -->
+{$rank_price.rank_name}：< span class="goodsPrice"
+id="ECS_RANKPRICE_{$key}">{$rank_price.price}</span>
+<!-- {/foreach} --></td>
+<td align="center" ><input name="number[{$product.product_id}]" id="number" value="1" type="text" size="3" /></td>
+<td align="center" >{$product.product_number}</td>
+</tr>
+<!-- {/foreach}-->
+<tr>
+<td colspan="6" align="right"><input type="image" name="submit"
+src="images/add_cart.gif"></td>
+</tr>
+</table>
+<input name="goods_id" value="{$goods.goods_id}" type="hidden" />
+<input name="step" value="all_addcart" type="hidden" />
+</form>
+ 
+2、打开goods.php 加入
+$smarty->assign('product_list',product_list($goods_id, ''));
+3、打开flow.php加入
+//-- 添加商品到购物车
+if($_REQUEST['step'] =='all_addcart')
+{
+$goods_id = $_POST["goods_id"];
+//获得批发相关值
+foreach($_POST['number'] as $idx=>$value)
+{
+$number = $value;
+$number_all= $value+$number_all;
+$goods_attr_id = join(",",$_POST['goods_attr'][$idx]);
+$product_sn = $_POST['product_sn'][$idx];
+addto_cart($goods_id,$number,$_POST['goods_attr'][$idx],'',$content); $arr[$idx] =
+array('number'=>$number,'goods_attr'=>$goods_attr_id,'product_sn'=>$product_sn); // $sql = $GLOBALS['db']->query("insert into ".$GLOBALS['ecs']->table('cart_p')." (goods_id,product_id,number,goods_attr,product_sn,session_id)
+values('$goods_id','$idx','$number','$goods_attr_id','$product_sn','".SESS_ID."')"); }
+//商品id
+// $content = serialize($arr);
+//$number = $number_all;
+ecs_header("Location:./flow.php\n");
+}
+function product_list($goods_id, $conditions = '')
+{
+$sql = "SELECT COUNT(*) FROM " .$GLOBALS['ecs']->table('products'). " AS p WHERE goods_id = $goods_id $where";
+$filter['record_count'] = $GLOBALS['db']->getOne($sql);
+$sql = "SELECT product_id, goods_id, goods_attr, product_sn, product_number FROM " . $GLOBALS['ecs']->table('products') . " AS g
+WHERE goods_id = $goods_id ";
+$row = $GLOBALS['db']->getAll($sql);
+$goods_attr = product_goods_attr_list($goods_id);
+foreach ($row as $key => $value)
+{
+$_goods_attr_array = explode('|', $value['goods_attr']);
+if (is_array($_goods_attr_array))
+{
+$_temp = '';
+foreach ($_goods_attr_array as $_goods_attr_value)
+{
+$_temp[] = $goods_attr[$_goods_attr_value];
+}
+$row[$key]['goods_attr'] = $_temp;
+}
+$row[$key]['goods_attr_id'] = $_goods_attr_array;
+}
+return $row; }

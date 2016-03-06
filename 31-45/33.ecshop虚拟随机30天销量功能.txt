@@ -1,0 +1,21 @@
+买东西的人都比较喜欢跟风，你去淘宝买东西也是，肯定找销量大的店来买，所以，我们可以造一个很热销的假象，怎样实现这个功能呢？ ecshop模板网摸索了一下，实现了这个功能，特拿出来与大家分享。
+
+1）进入后台“SQL查询”输入以下代码，提交
+ALTER TABLE `ecs_goods` ADD `goods_salesvolume` int(10) NOT NULL AFTER `goods_weight`;
+注意：如果你的数据表前缀 不是 ecs_ 请自行修改
+
+2）打开 /goods.php 文件，搜索到
+$smarty->assign('now_time',  gmtime());           // 当前系统时间
+在上面加入
+$db->query('UPDATE ' . $ecs->table('goods') . " SET goods_salesvolume = FLOOR(1 +(RAND() * 2345)) WHERE goods_id = '$_REQUEST[id]'");
+
+3）打开 /themes/你的模板文件夹/goods.dwt文件
+在要显示30天销量的位置，加入下面代码
+
+
+30天售出：{$goods.goods_salesvolume}件
+
+
+至此就大功告成了，是不是想迫不及待的看一下修改后的效果，那就看呗。
+
+此教程已经由我们技术人员亲测完美通过，只要你仔细认真的按照上面的方法去做，保障没问题。

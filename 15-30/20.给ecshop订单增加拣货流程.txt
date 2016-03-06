@@ -1,0 +1,178 @@
+针对ecshop订单中的物品，需要支持拣货的状态，比如未拣货、拣货中、拣货完成，以及显示拣货人姓名。
+-- ----------------------------
+-- Table structure for `order_picking_status`
+-- ----------------------------
+DROP TABLE IF EXISTS `order_picking_status`;
+CREATE TABLE `order_picking_status` (   `order_id` mediumint(8) NOTNULL,   `user_name` varchar(60)DEFAULT NULL,   `order_picking_status`smallint(5) NOT NULL DEFAULT '0',   PRIMARY KEY (`order_id`) ) ENGINE=InnoDB DEFAULT CHARSET=gbk;
+【2】在文件languages\zh_cn\admin\order.php中增加：
+
+/* 拣货 */
+$_LANG['order_picking_status'] = '拣货状态';
+$_LANG['order_picking_status_none'] = '未拣货';
+$_LANG['order_picking_status_processing'] = '拣货中';
+$_LANG['order_picking_status_finish'] = '拣货完成';
+$_LANG['invalid_order_picking_status'] = '拣货状态无效。0：未拣货；1：拣货中；2：拣货完成';
+【3】文件admin\templates\order_list.htm中在一下两行之间：
+
+<th>{$lang.all_status}</th>
+   <th>{$lang.handler}</th>
+<th>{$lang.order_picking_status}</th>
+<td align="center" valign="top" nowrap="nowrap">{$lang.os[$order.order_status]},{$lang.ps[$order.pay_status]},{$lang.ss[$order.shipping_status]}</td>
+<td align="right" valign="top"nowrap="nowrap"><span onclick="listTable.edit(this,'edit_order_picking_status', {$order.order_id})">{$order.user_name}【{if $order.order_picking_status == 1}{$lang.order_picking_status_processing}{elseif $order.order_picking_status ==2} {$lang.order_picking_status_finish} {else}{$lang.order_picking_status_none}{/if}
+     】</span></td>
+【4】admin\js\listtable.js中，listTable.edit的响应函数修改如下：
+
+/**  * 创建一个可编辑区  */
+listTable.edit = function(obj, act, id)
+{
+  var tag =obj.firstChild.tagName;
+ 
+  if (typeof(tag) !="undefined" && tag.toLowerCase() == "input")
+  {
+    return;
+  }
+ 
+  /* 保存原始的内容 */
+  var org = obj.innerHTML;
+  var val = Browser.isIE ?obj.innerText : obj.textContent;
+ 
+  /* 创建一个输入框 */
+  var txt =document.createElement("INPUT");
+  txt.value = (val == 'N/A') ?'' : val;
+  txt.style.width =(obj.offsetWidth + 12) + "px" ;
+ 
+  /* 隐藏对象中的内容，并将输入框加入到对象中 */
+  obj.innerHTML ="";
+  obj.appendChild(txt);
+  txt.focus();
+  txt.sel ect();
+ 
+  /* 编辑区输入事件处理函数 */
+  txt.onkeypress = function(e)
+  {
+    var evt =Utils.fixEvent(e);
+    var obj =Utils.srcElement(e);
+ 
+    if (evt.keyCode == 13)//www.ecshoptemplate.com
+    {
+      obj.blur();
+ 
+      return false;
+    }
+ 
+    if (evt.keyCode == 27)
+    {
+      obj.parentNode.innerHTML= org;
+    }
+  }
+ 
+  /* 编辑区失去焦点的处理函数 */
+  txt.onblur = function(e)
+  {
+    if(Utils.trim(txt.value).length > 0)
+    {
+      res =Ajax.call(listTable.url, "act="+act+"&val=" +encodeURIComponent(Utils.trim(txt.value)) + "&id=" +id, null,"POST", "JSON", false);
+ 
+      if (res.message)
+      {
+        alert(res.message);
+      }
+ 
+      if(res.id &&(res.act == 'goods_auto' || res.act == 'article_auto'))
+      {
+         document.getElementById('del'+res.id).innerHTML = "<ahref=\""+ thisfile +"?goods_id="+ res.id+"&act=del\" onclick=\"returnconfirm('"+deleteck+"');\">"+deleteid+"</a>";
+      }
+ 
+      obj.innerHTML = (res.error== 0) ? res.content : org;
+    }
+    else
+    {
+      obj.innerHTML = org;
+    }
+   
+    if (act =='edit_is_validated')
+    {
+         var content = obj.innerHTML.trim();
+        
+         if (content == '1' || content.indexOf("yes") >= 0)
+         {
+            obj.innerHTML = '<imgsrc="images/yes.gif">';
+         }
+         else
+        {
+            obj.innerHTML ='<img src="images/no.gif">';
+        }
+    }
+    else if (act =='edit_order_picking_status')
+    {
+         if (org == obj.innerHTML)
+         {
+            return true;
+         }
+        
+         if (obj.innerHTML == '1')
+         {
+            obj.innerHTML ="【拣货中】";
+         }
+         else if (obj.innerHTML == '2')
+        {
+            obj.innerHTML ="【拣货完成】";
+        }
+         else
+         {
+            obj.innerHTML ="【未拣货】";
+         }
+    }
+    else
+    {
+        
+    }
+  }
+}
+【5】admin\order.php文件中增加下面的函数：
+
+/*------------------------------------------------------ */
+//-- 订单拣货状态查询 /*------------------------------------------------------ */
+ 
+if ($_REQUEST['act'] == 'edit_order_picking_status')
+{
+    /* 检查权限 */
+   check_authz_json('users_manage');
+ 
+    $id =empty($_REQUEST['id']) ? 0 : intval($_REQUEST['id']);
+    $order_picking_status =empty($_REQUEST['val']) ? '' : json_str_iconv(trim($_REQUEST['val']));
+ 
+    $sql = "DELETE fromorder_picking_status WHERE order_id = '". $id ."' LIMIT 1";
+    $db->query($sql);
+   
+    $sql = "INSERT INTOorder_picking_status (order_id, user_name, order_picking_status) VALUES('". $id ."', '". $_SESSION['admin_name'] ."', '".$order_picking_status ."')";
+    $db->query($sql);
+   
+    if ($order_picking_status> 2 || $order_picking_status < 0)
+    {
+         make_json_error($GLOBALS['_LANG']['invalid_order_picking_status']);
+    }
+    else
+    {
+         make_json_result($order_picking_status);
+    }
+}
+/* 查询 */
+        $sql = "SELECTo.order_id, o.order_sn, o.add_time, o.order_status, o.shipping_status,o.order_amount, o.money_paid," .
+                   "o.pay_status, o.consignee, o.address, o.email, o.tel,o.extension_code, o.extension_id, " .
+                   "(" . order_amount_field('o.') . ") AS total_fee, ".
+                   "IFNULL(u.user_name, '" .$GLOBALS['_LANG']['anonymous']."') AS buyer ".
+                " FROM" . $GLOBALS['ecs']->table('order_info') . " AS o " .
+                " LEFT JOIN ".$GLOBALS['ecs']->table('users'). " AS u ON u.user_id=o.user_id ".$where .
+                " ORDERBY $filter[sort_by] $filter[sort_order] ".
+                " LIMIT" . ($filter['page'] - 1) * $filter['page_size'] .",$filter[page_size]";
+/* 查询 */
+        $sql = "SELECTo.order_id, o.order_sn, o.add_time, o.order_status, o.shipping_status,o.order_amount, o.money_paid," .
+                   "o.pay_status, o.consignee, o.address, o.email, o.tel,o.extension_code, o.extension_id, " .
+                    "(" .order_amount_field('o.') . ") AS total_fee, " .
+                   "IFNULL(u.user_name, '" .$GLOBALS['_LANG']['anonymous']."') AS buyer, p.user_name, p.order_picking_status ".
+                " FROM" . $GLOBALS['ecs']->table('order_info') . " AS o " .
+                " LEFTJOIN " .$GLOBALS['ecs']->table('users'). " AS u ONu.user_id=o.user_id ".
+                " LEFTJOIN order_picking_status AS p ON p.order_id = o.order_id ". $where .
+                " ORDERBY $filter[sort_by] $filter[sort_order] ".
+                " LIMIT" . ($filter['page'] - 1) * $filter['page_size'] .",$filter[page_size]";

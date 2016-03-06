@@ -1,0 +1,33 @@
+首先先打开includes下lib_goods.php写一个调取语句 代码如下 （可以加到这个文件的20几行左右）
+function get_child_cat($parent_id=0)//分类页调用子分类 不调用三级ecmoban.com
+{
+	$sql="SELECT * FROM ".$GLOBALS['ecs']->table('category')." WHERE  parent_id = '$parent_id' AND is_show = 1 ";
+	return $GLOBALS['db']->getAll($sql);
+	
+}
+
+第二步，打开根目录category.php
+
+找到以下代码：
+$smarty->assign('categories',       get_categories_tree($cat_id)); // 分类树
+	
+给它下面加入以下代码：
+
+$smarty->assign('childcat',       get_child_cat($cat_id)); // 分类页调用当前分类子分类
+
+最后在分类页模板category.dwt里调用自定义lbi 
+
+给lbi里写以下代码 ：
+
+<div class="screeBox clearfix" style=" border:2px solid #D1CCC7;">
+	<strong>分类:</strong>
+ 	<ul class="show_box" style=" height:30px; overflow:hidden; position:relative; border-bottom:none">
+  	<!--{foreach from=$childcat item=cat name=childcat}-->
+	 
+		<li><a href="category.php?id={$cat.cat_id}" >{$cat.cat_name|escape:html} </a> </li>
+		 
+		 
+	
+	<!--{/foreach}--> 
+     </ul>
+</div>

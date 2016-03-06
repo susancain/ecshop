@@ -1,0 +1,84 @@
+ 相关文件一：/user.php
+/* 添加/编辑收货地址的处理 */
+elseif ($action == 'act_edit_address')
+{
+    include_once(ROOT_PATH . 'includes/lib_transaction.php');
+    include_once(ROOT_PATH . 'languages/' .$_CFG['lang']. '/shopping_flow.php');
+    $smarty->assign('lang', $_LANG);
+ 
+    $address = array(
+        'user_id'    => $user_id,
+        'address_id' => intval($_POST['address_id']),
+        'country'    => isset($_POST['country'])   ? intval($_POST['country'])  : 0,
+        'province'   => isset($_POST['province'])  ? intval($_POST['province']) : 0,
+        'city'       => isset($_POST['city'])      ? intval($_POST['city'])     : 0,
+        'district'   => isset($_POST['district'])  ? intval($_POST['district']) : 0,
+        'address'    => isset($_POST['address'])   ? compile_str(trim($_POST['address']))    : '',
+        'consignee'  => isset($_POST['consignee']) ? compile_str(trim($_POST['consignee']))  : '',
+        'email'      => isset($_POST['email'])     ? compile_str(trim($_POST['email']))      : '',
+        'tel'        => isset($_POST['tel'])       ? compile_str(make_semiangle(trim($_POST['tel']))) : '',
+        'mobile'     => isset($_POST['mobile'])    ? compile_str(make_semiangle(trim($_POST['mobile']))) : '',
+        'best_time'  => isset($_POST['best_time']) ? compile_str(trim($_POST['best_time']))  : '',
+        'sign_building' => isset($_POST['sign_building']) ? compile_str(trim($_POST['sign_building'])) : '',
+        'zipcode'       => isset($_POST['zipcode'])       ? compile_str(make_semiangle(trim($_POST['zipcode']))) : '',
+        );
+ 
+    if (update_address($address))
+    {
+        show_message($_LANG['edit_address_success'], $_LANG['address_list_lnk'], 'user.php?act=address_list');
+    }
+}
+ 
+相关文件二：/includes/lib_transaction.php
+/**
+ *  添加或更新指定用户收货地址
+ *
+ * @access  public
+ * @param   array       $address
+ * @return  bool
+ */
+function update_address($address)
+{
+    $address_id = intval($address['address_id']);
+    unset($address['address_id']);
+ 
+    if ($address_id > 0)
+    {
+         /* 更新指定记录 */
+        $GLOBALS['db']->autoExecute($GLOBALS['ecs']->table('user_address'), $address, 'UPDATE', 'address_id = ' .$address_id . ' AND user_id = ' . $address['user_id']);
+    }
+    else
+    {
+        /* 插入一条新记录 */
+        $GLOBALS['db']->autoExecute($GLOBALS['ecs']->table('user_address'), $address, 'INSERT');
+        $address_id = $GLOBALS['db']->insert_id();
+    }
+ 
+    if (isset($address['defalut']) && $address['default'] > 0 && isset($address['user_id']))
+    {
+        $sql = "UPDATE ".$GLOBALS['ecs']->table('users') .
+                " SET address_id = '".$address_id."' ".
+                " WHERE user_id = '" .$address['user_id']. "'";
+        $GLOBALS['db'] ->query($sql);
+    }
+ 
+    return true;
+}
+if (isset($address['defalut']) && $address['default'] > 0 && isset($address['user_id']))，此语句有两个问题。
+
+“defalut”拼写错误，应该是“default”。
+$address数组没有指定defalut，因此上面的判断语句无任何意义，可删除。
+ecshop虽考虑了用户指定收货地址的功能，但却没有实现。
+
+
+
+
+
+ecshop用户中心收货地址无法保存默认收货地址错误问题
+2015-05-24 00:52来源：ECSHOP插件网人气：839我要评论下载本文
+经过我们ECSHOP插件网的技术人员实测，发现ECSHOP2.7.3版本和最新ECSHOP2.7.4版本，存在用户中心收货地址无法保存会员指定调用的默认收货地址也就是用户指定收货地址的功能没有实现错误问题。下面我们提供最新完美解决方案如下：
+
+打开includes/lib_transaction.php文件，搜索如下代码
+if (isset($address['defalut']) && $address['default'] > 0 && isset($address['user_id']))
+将以上这段代码修改为如下代码即可
+if (isset($address['user_id']))

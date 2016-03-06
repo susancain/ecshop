@@ -1,0 +1,149 @@
+ECShop后台管理菜单修改
+ECShop中，和后台菜单相关的文件有两个：
+
+·菜单项：admin\includes\inc_menu.php
+·菜单文本：languages\zh_cn\admin\common.php
+
+所以，要修改菜单主要也就是修改这两个文件了。
+
+理论基础
+
+1).菜单项管理
+
+inc_menu.php文件用于管理菜单数量、显示顺序、链接等，该文件内容形如：
+
+ 程序代码
+$modules['02_cat_and_goods']['01_goods_list']       = 'goods.php?act=list';         // 商品列表
+$modules['02_cat_and_goods']['02_goods_add']        = 'goods.php?act=add';          // 添加商品
+$modules['02_cat_and_goods']['03_category_list']    = 'category.php?act=list';
+$modules['02_cat_and_goods']['05_comment_manage']   = 'comment_manage.php?act=list';
+$modules['02_cat_and_goods']['06_goods_brand_list'] = 'brand.php?act=list';
+$modules['02_cat_and_goods']['08_goods_type']       = 'goods_type.php?act=manage';
+$modules['02_cat_and_goods']['11_goods_trash']      = 'goods.php?act=trash';        // 商品回收站
+$modules['02_cat_and_goods']['12_batch_pic']        = 'picture_batch.php';
+$modules['02_cat_and_goods']['13_batch_add']        = 'goods_batch.php?act=add';    // 商品批量上传
+$modules['02_cat_and_goods']['14_goods_export']     = 'goods_export.php?act=goods_export';
+$modules['02_cat_and_goods']['15_batch_edit']       = 'goods_batch.php?act=select'; // 商品批量修改
+$modules['02_cat_and_goods']['16_goods_script']     = 'gen_goods_script.php?act=setup';
+$modules['02_cat_and_goods']['17_tag_manage']       = 'tag_manage.php?act=list';
+$modules['02_cat_and_goods']['50_virtual_card_list']   = 'goods.php?act=list&extension_code=virtual_card';
+$modules['02_cat_and_goods']['51_virtual_card_add']    = 'goods.php?act=add&extension_code=virtual_card';
+$modules['02_cat_and_goods']['52_virtual_card_change'] = 'virtual_card.php?act=change';
+$modules['02_cat_and_goods']['goods_auto']             = 'goods_auto.php?act=list';
+
+
+$modules['03_promotion']['02_snatch_list']          = 'snatch.php?act=list';
+$modules['03_promotion']['04_bonustype_list']       = 'bonus.php?act=list';
+$modules['03_promotion']['06_pack_list']            = 'pack.php?act=list';
+$modules['03_promotion']['07_card_list']            = 'card.php?act=list';
+$modules['03_promotion']['08_group_buy']            = 'group_buy.php?act=list';
+$modules['03_promotion']['09_topic']                = 'topic.php?act=list';
+$modules['03_promotion']['10_auction']              = 'auction.php?act=list';
+$modules['03_promotion']['12_favourable']           = 'favourable.php?act=list';
+$modules['03_promotion']['13_wholesale']            = 'wholesale.php?act=list';
+$modules['03_promotion']['14_package_list']         = 'package.php?act=list';
+//$modules['03_promotion']['ebao_commend']            = 'ebao_commend.php?act=list';
+$modules['03_promotion']['15_exchange_goods']       = 'exchange_goods.php?act=list';
+
+做程序的应该都知道这是一个二维数组，格式如下：
+
+ 程序代码
+$modules['一级分类']['二级分类']='链接地址';
+
+它们在页面上的显示顺序测试发现是以分类名称进行排序的！
+
+2).菜单文本管理
+
+细心的可能问了，那菜单的文本呢？总不能就显示01_goods_list、02_goods_add这类文本吧，这就要用到common.php文件了。由于我们大都用简体中文，所以修改languages\zh_cn\admin\common.php文件就可以了，如果你要用繁体中文，那就修改languages\zh_tw\admin\common.php，其他依此类推。该文件内容形如：
+
+ 程序代码
+/* 菜单分类部分 */
+$_LANG['02_cat_and_goods'] = '商品管理';
+$_LANG['03_promotion'] = '促销管理';
+$_LANG['04_order'] = '订单管理';
+$_LANG['05_banner'] = '广告管理';
+$_LANG['06_stats'] = '报表统计';
+$_LANG['07_content'] = '文章管理';
+$_LANG['08_members'] = '会员管理';
+$_LANG['09_others'] = '杂项管理';
+$_LANG['10_priv_admin'] = '权限管理';
+$_LANG['11_system'] = '系统设置';
+$_LANG['12_template'] = '模板管理';
+$_LANG['13_backup'] = '数据库管理';
+$_LANG['14_sms'] = '短信管理';
+$_LANG['15_rec'] = '推荐管理';
+$_LANG['16_email_manage'] = '邮件群发管理';
+
+/* 商品管理 */
+$_LANG['01_goods_list'] = '商品列表';
+$_LANG['02_goods_add'] = '添加新商品';
+$_LANG['03_category_list'] = '商品分类';
+$_LANG['04_category_add'] = '添加分类';
+$_LANG['05_comment_manage'] = '用户评论';
+$_LANG['06_goods_brand_list'] = '商品品牌';
+$_LANG['07_brand_add'] = '添加品牌';
+$_LANG['08_goods_type'] = '商品类型';
+$_LANG['09_attribute_list'] = '商品属性';
+$_LANG['10_attribute_add'] = '添加属性';
+$_LANG['11_goods_trash'] = '商品回收站';
+$_LANG['12_batch_pic'] = '图片批量处理';
+$_LANG['13_batch_add'] = '商品批量上传';
+$_LANG['15_batch_edit'] = '商品批量修改';
+$_LANG['16_goods_script'] = '生成商品代码';
+$_LANG['17_tag_manage'] = '标签管理';
+$_LANG['18_product_list'] = '货品列表';
+$_LANG['52_attribute_add'] = '编辑属性';
+$_LANG['53_suppliers_goods'] = '供货商商品管理';
+
+其格式如下：
+
+ 程序代码
+$_LANG['一级分类或二级分类'] = '显示文本';
+
+实战管理菜单修改
+
+打开inc_menu.php，找到：
+
+ 程序代码
+$modules['07_content']['03_article_list']           = 'article.php?act=list';
+$modules['07_content']['02_articlecat_list']        = 'articlecat.php?act=list';
+$modules['07_content']['vote_list']                 = 'vote.php?act=list';
+$modules['07_content']['article_auto']              = 'article_auto.php?act=list';
+//$modules['07_content']['shop_help']                 = 'shophelp.php?act=list_cat';
+//$modules['07_content']['shop_info']                 = 'shopinfo.php?act=list';
+
+修改如下：
+
+ 程序代码
+$modules['07_content']['01_article_add']           = 'article.php?act=add';
+$modules['07_content']['02_article_list']           = 'article.php?act=list';
+$modules['07_content']['03_articlecat_list']        = 'articlecat.php?act=list';
+$modules['07_content']['vote_list']                 = 'vote.php?act=list';
+$modules['07_content']['article_auto']              = 'article_auto.php?act=list';
+//$modules['07_content']['shop_help']                 = 'shophelp.php?act=list_cat';
+//$modules['07_content']['shop_info']                 = 'shopinfo.php?act=list';
+
+打开common.php，找到：
+
+ 程序代码
+$_LANG['02_articlecat_list'] = '文章分类';
+$_LANG['articlecat_add'] = '添加文章分类';
+$_LANG['03_article_list'] = '文章列表';
+$_LANG['article_add'] = '添加新文章';
+$_LANG['shop_article'] = '网店文章';
+$_LANG['shop_info'] = '网店信息';
+$_LANG['shop_help'] = '网店帮助';
+$_LANG['vote_list'] = '在线调查';
+
+修改如下：
+
+ 程序代码
+/* 文章管理 */
+$_LANG['03_articlecat_list'] = '文章分类';
+$_LANG['articlecat_add'] = '添加文章分类';
+$_LANG['02_article_list'] = '文章列表';
+$_LANG['01_article_add'] = '添加新文章';
+$_LANG['shop_article'] = '网店文章';
+$_LANG['shop_info'] = '网店信息';
+$_LANG['shop_help'] = '网店帮助';
+$_LANG['vote_list'] = '在线调查';

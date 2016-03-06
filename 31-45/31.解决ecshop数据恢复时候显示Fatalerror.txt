@@ -1,0 +1,5 @@
+ecshop 数据恢复时候，时常因为文件太大而报错。Fatal error: Allowed memory size of
+
+在确保php.ini中“memory_limit ”值足够大的前提下，修改/admin/database.php中@ini_set(‘memory_limit’, ’64M’); 的数值即可
+
+注：修改@ini_set(‘memory_limit’,          ’64M’);是不行的，因为被/admin/database.php重置了。

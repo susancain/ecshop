@@ -1,0 +1,23 @@
+在做ecshop模板的时候由于user.php里的登录和注册是在一个页面里切换的，这就致使这里的登录和注册里的验证码不显示
+找到mobile/themesmobile/ecshoptemplate_mobile下user_passport.dwt文件
+首先将下面的内容去掉<script>
+      $().ready(function(){
+          //登录切换
+          $("#logRegTab li").bind("click", function () {
+              if (this.id == "mob_log") {
+                  $("#mob_log").removeClass("currl");
+                  $("#acc_log").addClass("currr");
+                  $("#phonearea").removeClass("hide");
+                  $("#accountarea").addClass("hide");
+              } else {
+                  $("#acc_log").removeClass("currr");
+                  $("#mob_log").addClass("currl");
+                  $("#phonearea").addClass("hide");
+                  $("#accountarea").removeClass("hide");
+              }
+  $(".btn_log").css("color","#FFFEFE");
+          });
+  });
+  </script>
+然后将登录和注册切换的标签去掉
+最终将{if $action eq 'login'}下面的注册有些去掉一起添加跳转到注册页面的连接，将{if $action eq 'register'}下面的登录有些去掉一起添加跳转到登录页面的连接

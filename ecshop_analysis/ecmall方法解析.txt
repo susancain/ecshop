@@ -1,0 +1,391 @@
+﻿ecmall/eccore /ecmall.php
+常量：
+define('START_TIME', ecm_microtime());
+
+
+define('IS_POST', (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST'));//判断请求方式是不是post传来的.
+
+
+define('IN_ECM', true);
+
+
+define('PHP_SELF', htmlentities(isset($_SERVER['PHP_SELF']) ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME']-));
+
+
+define('VERSION', '2.2 beta');
+
+
+define('RELEASE', '20091230');
+
+
+类 ECMall
+方法 startup(config = array())
+
+类 object
+方法 _error($msg,$obg = '')
+      has_error()//检测是否存在错误
+      get_error()//获取错误列表
+
+类 Lang
+方法 &get($key='')//获取指定键的语言项
+      load($lang_file)//加载指定的语言至全局语言数据中
+      fetch($lang_file)//获取一个语言文件的内容
+      lang_file($file)
+类 Conf
+方法 load($conf)
+      get($key = '')
+      &v($is_new = false, $engine = 'default')//获取试图连接     
+      &m($model_name, $params = array(), $is_new = false)//获取一个模型
+      &bm($model_name, $params = array(), $is_new = false)//获取一个业务模型
+      c(&$app)//获取当前控制器实例
+      &cc()
+      import()//导入一个类
+      strtokey($str,$owner = '')//将default.abc类的字符串转为$default['abc'];
+      trace($var)//跟踪调试
+      dump($arr)//rdump的别名
+      rdump($arr)//格式化显示出变量
+      vdump(arr)//格式化并显示出变量类型
+      &db()//创建MySQL数据库对象实例
+      get_domain()//获得当前的域名
+      size_url()//获得网站的URL地址
+      sub_str($string, $length = 0, $append = true)//截取UTF-8编码下字符串的函数
+      real_ip()//获得用户的真实IP地址
+      is_email($user_email)//验证输入的邮件地址是否合法
+      is_time($time)//检查是否为一个合法的时间格式
+      gd_version()获得服务器上的GD 版本
+      addslashes_deep($value)//递归方式的对变量中的特殊字符进行转义
+      addslashes_deep_obj($obj)//将对象成员变量挥着输注的特殊字符进行转义
+      stripslashes_deep($value)//递归方式的对变量中的特殊字符进行转义
+      make_semiangle($str)//将一个字符中含有拳脚的数字字符/字母/空格或'%+-()'字符转换为响应半角字符
+      format_fee($fee)//格式化费用:可以输入数字或百分比的地方
+      compute_fee($amount,$rate,$type)//根据总金额和费率计算费用
+      real_server_ip()//获取服务器的IP
+      get_crlf()//获取用户操作系统的换行符;
+      ecm_iconv($source_lang, $target_lang, $source_string = '')//编码转换函数
+      ecm_json_encode($value)
+      ecm_josn_decode($value,type = 0)
+      get_object_vars_deep($obj)//返回由对象属性著称的关联数组
+      file_ext($filename)
+      db_create_in($item_list,$field_name = '')//创建像这样的查询："IN('a','b')"
+      ecm_mkdir($absolute_path, $mode = 0777)//创建目录(如果该目录的上级目录不存在，会先创建上级目录),依赖于 ROOT_PATH 常量,且只能创建 ROOT_PATH 目录下的目录目录分隔符必须是 / 不能是 \
+      ecm_rmdsir($dir)//删除目录，不支持目录中带..
+      price_format($price, $price_format = NULL)
+      ecm_setcookie($key, $value, $expire = 0, $cookie_path=COOKIE_PATH, $cookie_domain=COOKIE_DOMAIN)//设置cookie
+      ecm_getcookie($key = '')//获取COOKIE的值
+      ecm_iconv_deep($source_lang,$target_lang,$value)//对数组转码
+      ecm_fopen($url, $limit = 500000, $post = '', $cookie = '', $bysocket = false, $ip = '', $timeout = 15, $block = true)//fopen封装函数
+      html_filter($html)//危险 HTML 过滤器
+      clean_cache()//清理系统所有编译器文件，缓存文件，模板结构数据
+      trim_right($str)//去掉字符串右侧可能出现的乱码
+      _at($fun)//通过该函数运行函数可以抑制错误
+      outer_call($func, $params=null)//调用外部函数  
+      reset_error_handler()
+      is_from_browser()//返回是否是通过浏览器访问的页面
+      ecm_define($source)//从文件或数组中定义常量
+      ecm_microtime()//获取当前的微秒数
+
+
+
+                                                            ecmall/eccore/model/model.base.php
+     
+      //除本基类文件外，所有的模型类的类名的构造规则应该是模型名(首字母大写)+model组成，文件名必须是模型名+.model组成如有一个用户模型，模型名为user，则其文件名应为user.model.php，类名为UserModel
+类：BaseModel extends Obiect
+属性：
+    var $db = null;
+
+   
+    var $table = '';
+
+   
+    var $prikey= '';
+
+   
+    var $alias = '';
+
+   
+    var $_name   = '';
+
+   
+    var $_prefix = '';
+
+   
+    var $_autov = array();
+
+   
+    var $_last_query_count = -1;
+
+   
+    var $_dropped_data = array();
+
+   
+    var $_relation = array();
+
+
+方法：__construct($params,$db)
+     BaseModel($params,$db)
+     getName()//获取模型名称
+     get($params)//获取单一一条记录
+     get_unfo($id)//根据ID取得信息
+     find($params = array())//根据一定条件找出相关数据(不连接其他模型，直接通过JOIN语句来查询)
+     findAll($params = array())//关联查找关于多对多关系的记录
+     getRelatedDate($relation_name, $ids, $find_param = array())//获取一对多，多对多的关联数据
+     add($data, $compatible = false)添加一条记录
+     createRelation($relation_name, $id, $ids)//添加多对多关联的中间表关系数据
+     updateRelation($relation_name, $id, $ids, $update_values)//更新多对多关系中的关系数据
+     unlinkRelation($relation_name, $conditions, $ids = null)//去除多对多的关联连接
+     _relationLink($action,$relation_name,$id,$ids,$update_values = array())//多对多关联表操作
+     edit($conditions, $edit_data)//简化更显操作
+     drop($conditions, $fields = '')简化删除记录操作
+     dropDependentData($keys)//删除依赖数据
+     _getExtLimit($ext_limit, $alias = null)//获取扩展限制
+     getDroppedDate()//获取实时保存的已删除记录
+     getCount()//获取统计数
+     _saveDroppedDate($sql)//临时保存已删除的记录数据
+     _updateLastQueryCount($sql)//更新查询统计数
+     _getConditions($conditions,$if_add_alias = false)//获取条件语段
+     _getSetFields($date)//获取设置字段
+     getRealFields($src_fields_list)//获取查询时的字段列表
+     _getFieldTable($owner)//解析字段所属
+     _getInsertInfo($data)//获取插入的数据的sql
+     _valid($data)//验证数据合法性，当时验证vrule中指定的字段，并且只当$date中这支了其值是才验证    
+     _initFindParams($params)
+     _joinModel(&$table,$join)//按指定的方式LEFT,JOIN指定关系的表
+     _getHoinString($relation_info)
+     getRelation($relation_name = null)//获取关系信息
+     getRelationByType($relation)
+     assemble($relation_name,$assoc_date,$pri_date)
+     dateEnough($date)
+     getRequiredFields()//获取必须的字段列表
+    
+    function getOne($sql)
+    {
+        return $this->db->getOne($sql);
+    }
+    function getRow($sql)
+    {
+        return $this->db->getRow($sql);
+    }
+    function getCol($sql)
+    {
+        return $this->db->getCol($sql);
+    }
+    function getAll($sql)
+    {
+        return $this->db->getAll($sql);
+    }
+
+
+
+                                                             
+
+                                                                         ecmall/eccore/model/mysql.php              
+类 cls_mysql
+方法 __construct($params,$db)
+     cls_mysql()//db构造函数
+     connect($dbhost, $dbuser, $dbpw, $dbname = '', $charset = 'utf8', $pconnect = 0, $quiet = 0)//连接数据库
+     select_database($dbname)
+     set_mysql_charset($charset)
+     fetch_array($charset)
+     query($sql,$type = '',$times=0)
+     function prefix($sql)
+    {
+        return preg_replace('/\s\`ecm_(.+?)\`([,|\s]?)/', ' ' .DB_PREFIX. '$1$2', $sql);
+    }
+
+    function affected_rows()
+    {
+        return mysql_affected_rows($this->_link_id);
+    }
+
+    function error()
+    {
+        return mysql_error($this->_link_id);
+    }
+
+    function errno()
+    {
+        return mysql_errno($this->_link_id);
+    }
+
+    function result($query, $row)
+    {
+        return @mysql_result($query, $row);
+    }
+
+    function num_rows($query)
+    {
+        return mysql_num_rows($query);
+    }
+
+    function num_fields($query)
+    {
+        return mysql_num_fields($query);
+    }
+
+    function free_result($query)
+    {
+        return mysql_free_result($query);
+    }
+
+    function insert_id()
+    {
+        return mysql_insert_id($this->_link_id);
+    }
+
+    function fetchRow($query)
+    {
+        return mysql_fetch_assoc($query);
+    }
+
+    function fetch_fields($query)
+    {
+        return mysql_fetch_field($query);
+    }
+
+    function version()
+    {
+        return $this->version;
+    }
+
+    function ping()
+    {
+        if (PHP_VERSION >= '4.3')
+        {
+            return mysql_ping($this->_link_id);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    function escape_string($d_string)
+    {
+        if (PHP_VERSION >= '4.3')
+        {
+            return mysql_real_escape_string($d_string);
+        }
+        else
+        {
+            return mysql_escape_string($d_string);
+        }
+    }
+
+    function close()
+    {
+        return mysql_close($this->_link_id);
+    }
+   
+    ErrorMsg($message = '',$sql = '')
+    selectLimit($sql,$num,$start = 0)//仿真 Adodb 函数
+    getOne($sql,$limited = false)
+    getOneCache($sql,$cached = 'FILEFIRST')
+    getAll($sql)
+    getAllWithIndex($sql_statement,$index_key)//以主键索引形式返回结果集
+    getAllCached($sql, $cached = 'FILEFIRST')
+    getRow($sql,$limited = false)
+    getRowCached($sql,$cached = 'FILEFIRST')
+    getCol($sql)
+    getColCached($sql,$cached = 'FILEFIRST')
+    autoExecute($table,$field_values,$mode = 'INSERT',$where = '',$querymode = '')
+    autoReplace($table,$field_values,$update_values,$where = '',$querymode = '')   
+    setMaxCacheTime($second)
+    getMaxCacheTime()
+    getSqlCacheData($sql,$cached = '')//获取数据记录集缓存
+    setSqlCacheData($result,$data)
+    table_lastupdate($tables)//获取 SQL 语句中最后更新的表的时间，有多个表的情况下，返回最新的表的时间
+    get_table_name($query_item)
+    set_disable_cache_tables($tables)//设置不允许缓存的表
+
+
+
+                                                                   ecmall/eccore/model/template.php
+类 ecsTemplate
+方法 __construct
+     ecsTemplate
+     assign($tpl_var,$value = '')
+     display($filename,$cache_id = '')//显示页面函数
+     display_cache()//显示缓存数据
+     fetch($filename,$cache_id = '')//处理模板文件
+     make_compiled($filename)//编译模板函数           
+     fetch_str($source)
+     is_cached($filename,cache_id = '')
+     select($tag)//处理()标签
+     get_val($val)//处理smarty标签中的变量标签
+     make_var($val)//处理去掉$的字符
+     &get_tempalte_vars($name = null)
+     _compile_if_tag($tag_args,$elseif = false)
+     _compile_foreach_start($tag_args)
+     push_vars($key,$val)//将foreach的key，item放入临时数组
+     pop_vars()//弹出临时数组的最后一个
+     _compile_smarty_ref(&$indexes)//处理smarty揩油的预定义变量
+     Java_script($args)//脚本标签
+     style($args)//样式标签
+     smarty_prefilter_preCompile($source)//替换模板中图片路径
+     url_rewrite($arr)// 返回URL重写后的字符串
+    
+     insert_mod($name)//处理动态内容
+     str_trim($str)//处理'a=b c=d k=f'类字符串，返回数组
+     _eval_r($content)
+     _require($filename)
+     _html_options($arr)
+     display_widgets($arr)
+     html_radion($arr)    
+     html_checkbox($arr)
+     html_page_links($arr)
+     _init_page_param($arr)
+     html_page_selector($arr)
+     html_page_simple($arr)
+     html_img_yesorno($arr)
+     html_sort_link($arr)
+     cycle($arr)
+     image($arr)
+     make_array($arr)
+     smarty_create_pages($pagams)
+     get_custom_model($id,$dir)//获取自定义模块
+     get_lang($key)//编译时解析语言
+     _sprintf($arr)//解析sprinf标签
+    
+   
+
+
+                                                                     ecmall/eccore/model/template.php
+控制器基础类 BaseApp extends Object
+方法 _construct
+     BaseApp
+     do_action
+     index
+     assign($k, $v = null)//给视图传递变量
+     display($n)//显示视图
+     _init_view()//初始化视图连接
+     _config_view()//配置视图
+     _run_action()//运行动作
+     _init_session()//初始化Session
+     _get_run_time($precision = 5)//获取程序运行时间
+     destruct()//控制器结束运行后执行
+     import_from_csv($filename,$header = true,$from_charset = '',$to_charset = '',$delimiter = ',')
+     export_to_csv($data,$filename,$to_charset = '')//导出csv文件
+     _replace_special_char($str,$replace = true)
+   
+
+
+
+                                                                     ecmall/eccore/model/message.base.php
+
+消息接收
+方法 _trigger_message($arr)
+      show_message($msg)
+      show_warning($msg)
+      _message($msg,$type)
+      exception_handler($errno,$errstr,$errfile,$errline)
+      put_log($err,$msg,$file,$line)//写入log文件
+
+
+类   Message extends MessageBase
+方法 _construct($str='',$errno=null)
+     Message($str,$errno = null)
+     handle_meassage($msg)
+     report_link($err,$msg,$file,$line)//生成bug报告连接
+     add_link($text,$href='javascript:history.back()')//添加一个连接到消息页面
+     display()//显示消息页面 
+

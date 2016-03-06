@@ -1,0 +1,8 @@
+给客户安装ecshop的时候，前台报如下500错误
+Internal Server Error
+The server encountered an internal error or misconfiguration and was unable to complete your request.
+Please contact the server administrator, you@example.com and inform them of the time the error occurred, and anything you might have done that may have caused the error.
+More information about this error may be available in the server error log.
+出现这个问题的原因很可能是文件的权限设置的不对
+解决方法是：
+linux下文件单个文件需要设置为755，当你设置的是777就会出现如下的问题。
