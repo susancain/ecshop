@@ -1,0 +1,290 @@
+A--开头的函数
+ 
+assign_ur_here($cat = 0, $str = '')
+功能：取得当前位置和页面标题
+参数：$cat为分类id(可以为产品分类，文章分类)int型,$str为(商品名称，文章标题)string类型
+返回结果：返回页面标题等数组(array)
+ 
+assign_template($ctype = '', $catlist = array())
+功能：给系统参数赋值
+参数：$ctype页面类型,字符串型.$catlist为
+返回结果：给相对应的页面赋值
+例子：category.php中，assign_template('c', array($cat_id));
+ 
+
+article_related_goods($id)
+功能：获得文章关联的商品
+参数：$id为文章的id,int类型。
+返回结果：和文章对应的产品数组
+例子：article_related_goods(1)
+ 
+addto_cart($goods_id, $num = 1, $spec = array(), $parent = 0)
+功能：添加商品到购物车
+参数：$goods_id为产品id,int数据类型,$num为购买该产品的数量,int数据类型.$spec为产品规格参数等，为array数据类型,$parent基本件，为int数据类型。
+返回结果：如果操作成功，返回true,否则返回false
+
+affirm_received($order_id, $user_id = 0)
+功能：确认一个用户订单
+参数：$order_id为订单的id,int数据类型.$user_id为用户的id,int数据类型
+返回结果：如果确认成功，返回true,否则返回false
+ 
+add_message($array)
+功能：提交留言
+参数：$array为留言的内容，为array数组类型
+返回结果：如果提交留言成功，返回真，否则为假
+例子：  $message = array(
+        'user_id'     => $user_id,
+        'user_name'   => $user_name,
+        'user_email'  => isset($_POST['user_email']) ? htmlspecialchars(trim($_POST['user_email']))     : '',
+        'msg_type'    => isset($_POST['msg_type']) ? intval($_POST['msg_type'])     : 0,
+        'msg_title'   => isset($_POST['msg_title']) ? trim($_POST['msg_title'])     : '',
+        'msg_content' => isset($_POST['msg_content']) ? trim($_POST['msg_content']) : '',
+        'order_id'    => 0,
+        'msg_area'    => 1,
+        'upload'      => array()
+     );
+add_message($message)
+admin_log($sn = '', $action, $content)
+功能：记录管理员的操作内容
+参数：$sn为动作，string数据类型.$content为操作记录的内容
+返回结果：return  void
+auction_info($act_id, $config = false)
+功能：取得拍卖活动信息
+参数：$cat_id为活动的ID，int数据类型
+返回结果：活动相关的数据，array数据类型
+ 
+available_payment_list($support_cod, $cod_fee = 0, $is_online = false)
+功能:取得可用的支付方式列表
+参数:$support_code主要是支付方式代码表示,$cod_fee货到付款手续费为int数据类型,$is_online是否在线支付,为bool数据类型
+返回:支付方式列表方式数组
+ function admin_priv($priv_str, $msg_type = '' , $msg_output = true)
+功能:判断管理员对某一个操作是否有权限。
+参数:$priv_str表示某个操作权限标识符,string类型。$msg_type为返回的类型string.$msg_output为输出信息.string数据类型。
+返回值:如果有该权限，返回true.否则返回false
+ 
+D--开头的函数
+ 
+drop_consignee($id)
+功能：删除一个收货地址
+参数：$id为收货地址的id,int数据类型.
+返回:返回是否删除指定的收货地址成功,bool类型
+
+delete_tag($tag_words, $user_id)
+功能： 验证性的删除某个tag
+参数：$tag_words为标签名称,string数据类型.$user_id为用户id,为整型
+返回:返回是否删除指定的tags成功,bool类型
+dyna_libs_replace($matches)
+功能： 替换动态模块
+参数：$matches为匹配内容,string类型。
+返回：替换后的内容string类型
+ 
+ 
+G--开头的函数
+ 
+get_recommend_goods($type = '', $cats = '')
+功能：获得推荐商品
+参数：$type是string推荐类型，可以是best,new,hot
+返回结果：数组
+例子：get_recommend_goods('best')
+
+get_promote_goods($cats = '')
+功能：获得促销商品
+参数：$cats是int推荐类型,也可以为空，表示分类id
+返回结果：数组
+例子：get_promote_goods()
+
+get_shop_help()
+功能：获取网站的帮助信息，他对应的类别id为5
+参数：参数为空
+返回结果：数组
+get_brands($cat = 0, $app = 'brand')
+功能：获取所有品牌，或者是某分类下面的品牌
+参数：$cat为产品分类id,为int类型
+返回结果：数组(商品品牌)
+ 
+get_cat_info($cat_id)
+功能：获得产品分类信息，通过id获取
+参数：$cat_id为产品分类id,为int类型
+返回结果：产品类别的信息(array)
+ 
+get_categories_tree($cat_id)
+功能：获取该分类下的所有子类，或者是该分类下的父类的同级，通过id获取
+参数：$cat_id为产品分类id,为int类型
+返回结果：类别信息数据组信息(array)
+ 
+get_category_recommend_goods($type = '', $cats = '', $brand = 0, $min =0,  $max = 0, $ext='')
+功能：获得指定分类下的推荐商品
+参数：$type为推荐类型，可以是(best, new, hot, promote),为string类型。$cats产品分类的id,为int型,$brand为产品品牌id为int类型,$min为产品价格下限,为int型,$max为产品价格上限,$ext为商品的一些扩展查询，为string类型
+返回结果：返回产品信息(array)
+ 
+
+get_cagtegory_goods_count($children, $brand = 0, $min = 0, $max = 0, $ext='')
+功能：获得获得分类下的商品总数
+参数：$children字符串,$brand为该类别下的品牌int类型,$min为产品价格下限int类型,$max为产品类型上限int类型,$ext为产品查询扩展string类型
+返回结果：返回该分类下商品的数量(int)
+ 
+
+get_goods_info($goods_id)
+功能：获得商品的详细信息
+参数：$goods_id为产品编号id,为int类型
+返回结果：返回产品详细信息(array)
+ 
+get_linked_goods($goods_id)
+功能：获得指定商品的关联商品
+参数：$goods_id为产品编号id,为int类型
+返回结果：返回和该产品想关联的产品信息(array)
+ 
+
+get_linked_articles($goods_id)
+功能：获得指定商品的关联文章
+参数：$goods_id为产品编号id,为int类型
+返回结果：返回和该产品相关的文章(array)
+ 
+get_goods_fittings($goods_list = array())
+功能：获得购物车中商品的配件
+参数：$goods_list为产品信息,为array类型
+返回结果：返回购物车中商品的配件
+ 
+
+get_user_rank_prices($goods_id, $shop_price)
+功能：获得指定商品的各会员等级对应的价格
+参数：$goods_id为产品编号id,$shop_price为产品本店兽价
+返回结果：返回购物车中商品的配件
+ 
+
+get_tags($goods_id = 0, $user_id = 0)
+功能：获得指定用户、商品的所有标记
+参数：$goods_id为产品编号id,$user_id为注册用户id,为int类型
+返回结果：返回该产品下的标签，或者是用户id 下标签(array)
+ 
+get_also_bought($goods_id)
+功能：获得购买过该商品的人还买过的商品
+参数：$goods_id为产品编号id
+返回结果：返回购买过此产品的人，还购买过其他产品(array)
+ 
+group_buy_list($size, $page)
+功能：取得某页的所有团购活动
+参数：$size为每个页面显示团购活动的数量，$page为分页的页id
+返回结果：返回团购数组(array)
+ 
+
+get_msg_list($num, $start)
+功能：获取留言的详细信息
+参数：$num为每页获取记录的条数(int)类型,$start为留言记录显示的起始(int)类型
+返回结果：返回留言详细信息
+ 
+
+get_brand_info($id)
+功能：获得指定品牌的详细信息
+参数：$id为品牌id,int类型。
+返回结果：返回品牌信息(array)
+ 
+
+get_article_info($article_id)
+功能：获得指定的文章的详细信息
+参数：$article_id为文章的id编号，int数据类型。
+返回结果：返回文章内容，标题等信息(array)
+例子：get_article_info($article_id);
+ 
+ 
+
+get_consignee_list($user_id)
+功能：取得收货人地址列表
+参数：$user_id为用户编号id,为int数据类型
+返回结果：返回收货人地址列表，为array类型
+例子：get_consignee_list($_SESSION['user_id']);
+ 
+get_regions($type = 0, $parent = 0)
+功能：获得指定国家的所有省份
+参数：$type为地区类型,int数据类型，$parent为上级地区id,int数据类型
+返回结果：返回国家的所有省份，为array类型
+例子：get_regions(1, $choose['country']);
+ 
+function get_cat_articles($cat_id, $page = 1, $size = 20)
+功能：获得文章分类下的文章列表
+参数：$cat_id为文章的分类ID，int数据类型.$page为分页所在的页码，int数据类型.$size为分页文章显示的条数,int数据类型
+ 
+
+get_article_count($cat_id)
+功能：获得文章分类下的文章列表
+参数：$cat_id为文章的分类ID，int数据类型.$page为分页所在的页码，int数据类型.$size为分页文章显示的条数,int数据类型
+ 
+
+get_final_price($goods_id, $goods_num = '1', $is_spec_price = false, $spec = array())
+功能：取得商品最终使用价格
+参数：$goods_id为商品id,int数据类型.$goods_num为商品数量,int数据类型 ,$is_spec_price是否加入规格价格,bool数据类型.$spec为规格ID的数组或者逗号分隔的字符串,array数据类型
+ 
+
+get_consignee($user_id)
+功能：取得收货人信息
+参数：$user_id为用户的id,int数据类型
+返回结果：收货人详细信息
+ 
+get_user_orders($user_id, $num = 10, $start = 0)
+功能：获取用户指定范围的订单列表
+参数：$user_id为用户的id,int数据类型,$num为每页订单显示的跳鼠,int数据类型，$start订单显示的起始位置，int数据类型
+返回结果：指定用户的订单列表array数据类型
+ 
+get_user_tags($user_id = 0)
+功能：获取用户的tags
+参数：$user_id为用户的id,int数据类型
+返回结果：返回标签列表array
+ 
+get_tags($goods_id = 0, $user_id = 0)
+功能：获得指定用户、商品的所有标记
+参数：$user_id为用户的id,int数据类型,$goods_id为产品id,int数据类型
+返回结果：返回标签列表array
+ 
+get_booking_rec($user_id, $goods_id)
+功能：查看此商品是否已进行过缺货登记
+参数：$user_id为用户的id,int数据类型,$goods_id为产品id,int数据类型
+返回结果：返回该产品登记缺货记录的条数
+ 
+ delete_booking($booking_id, $user_id)
+功能：验证删除某个收藏商品
+参数：$user_id为用户的id,int数据类型,$booking_id为登记缺货ID，为int数据类型
+返回结果：返回删除的执行结果
+ 
+
+get_user_bouns_list($user_id, $num = 10, $start = 0)
+功能：列表该用户帐户下的红包
+参数：$user_id为用户的id,int数据类型,$num为分页显示的条数,$start为显示记录的起始位置
+返回结果：返回红包列表array
+ 
+ 
+
+get_comment_list($user_id, $page_size, $start)
+功能：获取用户评论
+参数：$user_id为用户的id,int数据类型,$page_size为分页显示的条数,$start为显示记录的起始位置
+返回结果：返回户评论列表array
+ 
+ 
+get_user_surplus($user_id)
+功能：查询会员余额的数量
+参数：$user_id为用户的id,int数据类型,
+返回结果：返回会员余额的数量int类型
+ 
+get_account_log($user_id, $num, $start)
+功能：查询会员余额的操作记录
+参数：$user_id为用户的id,int数据类型,$num为每页显示的数量int数据类型,$start为显示记录的起始位置，为int数据类型
+返回结果：返回会员余额的操作记录array
+
+get_snatch($id)
+功能： 取得当前活动信息
+参数：$id为活动的id,int数据类型
+返回结果：返回活动名称已经相关基本信息array数据类型
+
+get_snatch_result($id)
+功能： 获取指定 id snatch 活动的结果
+参数：$id为活动的id,int数据类型
+返回结果： array(user_name, bie_price, bid_time, num)num通常为1，如果为2表示有2个用户取到最小值，但结果只返回最早出价用户。
+ 
+get_goods_properties($goods_id)
+功能： 获得商品的属性和规格
+参数：$goods_id为商品ID,int数据类型
+返回结果： 返回商品属性数组，为array数据类型
+
+get_navigator($ctype = '', $catlist = array())
+功能： 取得自定义导航栏列表
+参数：$ctype表示导航所处于的位置.top,middle,bottom
+返回结果： 返回导航的名称地址,array()数据类型
